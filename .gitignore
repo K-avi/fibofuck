@@ -1,0 +1,5 @@
+*.o
+fibofuck 
+test
+parser\...\..
+lex\...\..
