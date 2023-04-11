@@ -1,1 +1,15 @@
-set up directory ig.
+set up the manipulation of 
+
+-> skew heaps 
+    -nothing done atm 
+
+-> list of tree roots for fibo heap 
+    -nothing done atm
+
+-> implement the fibo heap proper 
+    -not done atm 
+
+
+once all of this is done with move on to tuning parsing n then exec
+
+at least the docu is done ig lol

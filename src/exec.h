@@ -5,7 +5,7 @@
 #include "fibo.h"
 #include "stack.h"
 
-extern int exec( );
+extern int exec();
 
 
 
