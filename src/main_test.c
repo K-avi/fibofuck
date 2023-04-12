@@ -77,6 +77,48 @@ int main(){
   decrNode(heap1->lchild->lchild);
   decrNode(heap1->lchild->lchild);
   
+
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+  incrNode(heap1);
+
   printf("a is %d\n", a);
 
         printInOrderHeap(heap1);

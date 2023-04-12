@@ -153,37 +153,76 @@ int popRoot (S_NODE ** skHeapPTR){
     return ret; 
 }//tested ;seems ok
 
-int popNode (S_NODE * heapNode){
+int popNode (S_NODE ** heapNodePTR){
     /* 
     frees node passed; merges it's children ; 
     and then merges the result with it's parent
 
-    returns 0 if nullptr passed
+    returns 0 if nullptr passed ; should prolly print smtg in stderr
     */
+    if(!heapNodePTR) return 0;
+    
+    S_NODE * heapNode = *heapNodePTR;
+
     if(! heapNode) return 0; 
 
-    //S_NODE * parent= heapNode->parent;
+    if(!heapNode->parent){ //Case where node given is root
+        return popRoot(heapNodePTR);
+    }else if(!(heapNode->lchild || heapNode->rchild)){ //case where node passed is a leaf
+            
 
-    S_NODE * newBranch= mergeHeaps(heapNode->lchild, heapNode->rchild);
-    if(newBranch) newBranch->parent= NULL;
-    
-    int ret = heapNode->key;
+    }else{
 
-    free(heapNode); 
-    heapNode= newBranch;
-
-  //  heapNode->parent= parent; 
-    return ret; 
-
-}//not tested 
-
-void incrNode( S_NODE * heapNode){
-
-}//not done
+    }
+}//DEPRECATED DOESNT WORK!!! WATCH OUT
 
 void minHeapify ( S_NODE *  heapNode){
+    /*
+    checks for nullptr 
+    given a node heapifies the subtree starting from this root 
+    
+    */
+    if(!heapNode) return;
+    
+    int min= heapNode->key;
+    S_NODE * minNode= heapNode;
+    if(heapNode->lchild){
+        if(heapNode->lchild->key< min){
+            min= heapNode->lchild->key; 
+            minNode= heapNode->lchild;
+        }
+    }
 
-}//not done
+    if(heapNode->rchild){
+        if(heapNode->rchild->key< min){
+            min= heapNode->rchild->key; 
+            minNode= heapNode->rchild;
+        }
+    }
+
+    if(min!=heapNode->key){
+        swapKey(heapNode, minNode);
+        minHeapify(minNode);
+    }
+    
+}//tested seems ok 
+
+void incrNode( S_NODE * heapNode){
+    /*
+    increment a given node by one and heapifies it
+
+    checks for nullptr
+    */
+
+    if(!heapNode) return;
+
+    heapNode->key++ ;
+
+    minHeapify(heapNode);
+
+}//tested seems ok
+
+
 
 
 
