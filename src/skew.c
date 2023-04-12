@@ -32,7 +32,7 @@ S_NODE * initNode(int key){
     ret->lchild=ret->rchild=ret->parent=NULL;
 
     return ret;
-}//not tested ; pretty sure it works though
+}//tested; ok
 
 void freeSkewHeap(S_NODE * heap){
     /*
@@ -46,7 +46,7 @@ void freeSkewHeap(S_NODE * heap){
         freeSkewHeap(heap->rchild); 
         free(heap);
     }
-}//not tested
+}//tested; ok
 
 
 /* skew heap manipulation function */
@@ -59,8 +59,7 @@ void swapKey( S_NODE * node1, S_NODE* node2){
         node1->key= node2->key;
         node2->key= tmp;
     }
-}//not tested; prolly ok though 
-//maybe useless
+}//tested; ok 
 
 
 S_NODE * mergeHeaps( S_NODE * SkewHeap1, S_NODE * SkewHeap2){
@@ -80,17 +79,20 @@ S_NODE * mergeHeaps( S_NODE * SkewHeap1, S_NODE * SkewHeap2){
     if(SkewHeap1->key> SkewHeap2->key){
         swapKey(SkewHeap1, SkewHeap2);
     }
-    printf("sk1 k %d\n sk2 k %d\n", SkewHeap1->key, SkewHeap2->key);
+   
     S_NODE * tmp = SkewHeap1->rchild;
       
     SkewHeap1->rchild= SkewHeap1->lchild;
-    printf("call merge else if\n");
+   
 
     SkewHeap1->lchild= mergeHeaps(SkewHeap2, tmp);
-    SkewHeap1->lchild->parent=SkewHeap1;
+    
+    if(SkewHeap1->rchild) SkewHeap1->rchild->parent=SkewHeap1;
+    if(SkewHeap1->lchild) SkewHeap1->lchild->parent=SkewHeap1;
+
     return SkewHeap1;
     
-}//ot tested 
+}//tested; ok
 //prolly an issue with the parent though
 
 S_NODE* insertHeap(S_NODE* skHeap, int value){
@@ -105,7 +107,7 @@ S_NODE* insertHeap(S_NODE* skHeap, int value){
     }
     return mergeHeaps(skHeap, newNode);
 
-}//not tested
+}//tested; ok
 
 void decrNode( S_NODE * heapNode ){
     /*
@@ -117,7 +119,7 @@ void decrNode( S_NODE * heapNode ){
 
     while(heapNode->parent){ //swap w parent while parent is gt than u
 
-        if(heapNode->parent->key < heapNode->key){
+        if(heapNode->parent->key > heapNode->key){
             
             int tmpKey = heapNode->key; 
            
@@ -128,25 +130,28 @@ void decrNode( S_NODE * heapNode ){
         }
         heapNode=heapNode->parent;
     }
-}//not tested 
+}//tested ; seems ok
 
-int popRoot (S_NODE * skHeap){
+int popRoot (S_NODE ** skHeapPTR){
     /*
     returns 0 if nullptr passed
     */
-   if(!skHeap) return 0;
+   if(!skHeapPTR) return 0;
+   S_NODE * skHeap = *skHeapPTR;
 
+   if(!skHeap) return 0;
    S_NODE * skL =  skHeap->lchild, *skR= skHeap ->rchild;
 
     int ret = skHeap->key; 
     S_NODE * tmp = skHeap; 
 
-    skHeap = mergeHeaps(skL, skR);
+    *skHeapPTR = mergeHeaps(skL, skR);
 
+    (*skHeapPTR)->parent=NULL;
     free(tmp);
 
     return ret; 
-}//not tested; 
+}//tested ;seems ok
 
 int popNode (S_NODE * heapNode){
     /* 
@@ -170,15 +175,17 @@ int popNode (S_NODE * heapNode){
   //  heapNode->parent= parent; 
     return ret; 
 
-}//incorrect; do not use ; not good at all 
+}//not tested 
+
+void incrNode( S_NODE * heapNode){
+
+}//not done
 
 void minHeapify ( S_NODE *  heapNode){
 
 }//not done
 
-void incrNode( S_NODE * heapNode){
 
-}//not done
 
 void printInOrderHeap( S_NODE * heapNode) {
 

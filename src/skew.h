@@ -42,7 +42,7 @@ extern void swapNodes ( S_NODE * node1 , S_NODE * node2);
 extern S_NODE * mergeHeaps( S_NODE * SkewHeap1, S_NODE * SkewHeap2);
 extern S_NODE* insertHeap(S_NODE* skHeap, int value);
 extern void decrNode( S_NODE * heapNode );
-extern int popRoot (S_NODE * skHeap);
+extern int popRoot (S_NODE ** skHeap);
 extern int popNode (S_NODE * heapNode);
 
 
