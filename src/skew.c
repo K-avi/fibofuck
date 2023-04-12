@@ -75,27 +75,25 @@ S_NODE * mergeHeaps( S_NODE * SkewHeap1, S_NODE * SkewHeap2){
     }else if(!SkewHeap2){//trivial case :only sh1
 
         return SkewHeap1;
-    }else if(SkewHeap1->key < SkewHeap2->key){
-        
-        S_NODE * tmp = SkewHeap1->rchild;
-      
-        SkewHeap1->rchild= SkewHeap1->lchild;
-        
-        SkewHeap1->lchild= mergeHeaps(SkewHeap2, tmp);
-
-        SkewHeap1->lchild->parent=SkewHeap1;
-        return SkewHeap1;
-    }else{ 
-        return mergeHeaps(SkewHeap2, SkewHeap1);
     }
+        
+    if(SkewHeap1->key> SkewHeap2->key){
+        swapKey(SkewHeap1, SkewHeap2);
+    }
+    printf("sk1 k %d\n sk2 k %d\n", SkewHeap1->key, SkewHeap2->key);
+    S_NODE * tmp = SkewHeap1->rchild;
+      
+    SkewHeap1->rchild= SkewHeap1->lchild;
+    printf("call merge else if\n");
+
+    SkewHeap1->lchild= mergeHeaps(SkewHeap2, tmp);
+    SkewHeap1->lchild->parent=SkewHeap1;
+    return SkewHeap1;
     
-
-
-
-}//not tested 
+}//ot tested 
 //prolly an issue with the parent though
 
-void insertHeap(S_NODE* skHeap, int value){
+S_NODE* insertHeap(S_NODE* skHeap, int value){
     /*
     doesn't check for null bc skHeap can be empty and the new node becomes the only node in the heap
     */
@@ -103,10 +101,9 @@ void insertHeap(S_NODE* skHeap, int value){
     S_NODE* newNode= initNode(value); 
     if(!newNode){
         fprintf(stderr, "failed to allocate memory for a new node in the heap\n");
-        return;
+        return skHeap;
     }
-    skHeap= mergeHeaps(skHeap, newNode);
-
+    return mergeHeaps(skHeap, newNode);
 
 }//not tested
 
