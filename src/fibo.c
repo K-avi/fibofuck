@@ -34,6 +34,8 @@ void freeEntry(L_ENTRY* entry){
     free(entry);
 }//not tested ; prolly ok
 
+/////////////////
+
 /* heap set init / alloc*/
 
 HEAP_SET* initSet(unsigned size){
@@ -47,6 +49,7 @@ HEAP_SET* initSet(unsigned size){
     ret->minIndex=0;
     ret->nbelem=0;
     ret->size=0;
+    ret->nbRoot=0;
     ret->entrylist= (L_ENTRY**) calloc(size* sizeof(L_ENTRY*), sizeof(L_ENTRY*));
 
     if(!ret->entrylist){
@@ -60,56 +63,103 @@ HEAP_SET* initSet(unsigned size){
 
 void freeSet(HEAP_SET * set){
     /*
-    do I free every tree ???
+    checks for nullptr
+    completely purges the heaps 
     */
-}
+    if(!set) return;
 
-void reallocSet(HEAP_SET * set){
+    for (unsigned i=0; i<set->size ; i++){
+        if(set->entrylist[i]){
+            freeEntry(set->entrylist[i]);
+        }
+    }
+    free(set->entrylist); 
+    free(set);
+}//not tested; prolly ok
+
+
+void reallocSet(HEAP_SET * set, unsigned size){
     /*
+    checks for nullptr
+    throws error if realloc fails
     */
-}
+    if(!set) return;
+    if(!set->entrylist) return; //?????
 
-void mergeElems(HEAP_SET * set){
-    /*
-    need to think about the general merge rule cuz i'm not sure yet tbh
-    */
+    set->entrylist= realloc(set->entrylist, size * sizeof(L_ENTRY* ));
 
-}
+    if(!set->entrylist){
+        fprintf(stderr, "error placeholder message\n");
+        return;
+    }else{
+        set->size+=size;
+        return;
+    }
+
+}//not tested
+
+
+/*fibo heap manipulation function */
 
 
 /* heap primitives */
 void insertSet(HEAP_SET * set, int key){
     /*
     checks for nullptr and allocation
+    handles reallocation!
     */
 
    if(!set) return;
 
-  L_ENTRY * newEntry = initEntry(key);
+   if(set->size==set->nbRoot){
+        
+        reallocSet(set, _set_realloc_default);
+        if(!set->entrylist){
+            fprintf(stderr, "error in insertSet(%p , %d) realloc failed\n", (void*)set,key);
+            return;
+        }
+   }
+
+   L_ENTRY * newEntry = initEntry(key);
   
-  if(!newEntry){
-    fprintf(stderr, "error: in insertSet(%d) couldn't allocate memory for new entry\n",key);
-    return;
-  }
-//check insertion and realloc if need be
-  for(unsigned i=0; i<set->size; i++){
-    if(! set->entrylist[i]){
-        set->entrylist[i]=newEntry;
-    }
-  }
+   if(!newEntry){
+        fprintf(stderr, "error: in insertSet(%p, %d) couldn't allocate memory for new entry\n", (void*) set, key);
+        return;
+   }
 
-
+   for(unsigned i=0; i<set->size; i++){
+        if(! set->entrylist[i]){
+            set->entrylist[i]=newEntry;       
+            set->nbelem++;
+            set->nbRoot++;
+        }
+   }
   
-    
-    
-}
+}//not tested; CHECK IF ITS GOOD ; potential edge cases insertion 
+// shouldn't need the loop in realloc case
 
-void removeSet(HEAP_SET * set){
+void removeSet(HEAP_SET * set, unsigned index){
     /*
+    frees the entry at a given index; 
+    DOESNT FREE TREE OF THE ENTRY ONLY USE AFTER MERGE!!!
     */
-}
+    if(!set) return;
+    if(!set->entrylist) return;
+    if(set->size<=index) return;
+
+    free(set->entrylist[index]);
+    set->entrylist[index]=NULL;
+    set->nbRoot--;
+
+}//not tested; prolly ok ? document usage properly 
 
 
+void merge ( HEAP_SET * set){
+    /*
+    hell.
+    */
 
+    if(!set) return;
+    if(!set->entrylist) return;
 
-/*fibo heap manipulation function */
+}//not done 

@@ -1,7 +1,6 @@
 %option header-file="lex.yy.h"
 %option noinput nounput noyywrap
 
-
 %{
   #include "parser.tab.h"
   #define TOKEN(t) yylval.token = (t)

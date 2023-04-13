@@ -16,3 +16,7 @@ set up the manipulation of
 once all of this is done with move on to tuning parsing n then exec
 
 at least the docu is done ig lol
+
+start to think about the tokens and the parser 
+
+merge will be so painfull 
