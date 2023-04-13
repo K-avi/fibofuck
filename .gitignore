@@ -2,5 +2,5 @@
 *.o
 fibofuck 
 test
-parser\...\..
-lex\...\..
+parser.**.*
+lex.**.*

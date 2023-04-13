@@ -153,6 +153,7 @@ int popRoot (S_NODE ** skHeapPTR){
     return ret; 
 }//tested ;seems ok
 
+
 int popNode (S_NODE ** heapNodePTR){
     /* 
     frees node passed; merges it's children ; 
@@ -161,7 +162,7 @@ int popNode (S_NODE ** heapNodePTR){
     returns 0 if nullptr passed ; should prolly print smtg in stderr
     */
     if(!heapNodePTR) return 0;
-    
+    int ret=0;
     S_NODE * heapNode = *heapNodePTR;
 
     if(! heapNode) return 0; 
@@ -169,12 +170,29 @@ int popNode (S_NODE ** heapNodePTR){
     if(!heapNode->parent){ //Case where node given is root
         return popRoot(heapNodePTR);
     }else if(!(heapNode->lchild || heapNode->rchild)){ //case where node passed is a leaf
-            
+            if(heapNode->parent->lchild==heapNode){
+                heapNode->parent->lchild=NULL;
+            }else{
+                heapNode->parent->rchild=NULL;
+            }
+            ret=heapNode->key;
+            free(heapNode);
 
-    }else{
+    }else{  
+
+        if(heapNode->parent->lchild==heapNode){
+                heapNode->parent->lchild=mergeHeaps(heapNode->lchild, heapNode->rchild);
+                heapNode->lchild->parent=heapNode->parent;
+        }else{
+                heapNode->parent->rchild=mergeHeaps(heapNode->lchild, heapNode->rchild);
+                heapNode->rchild->parent=heapNode->parent;
+        }
+        ret=heapNode->key;
+        free(heapNode);
 
     }
-}//DEPRECATED DOESNT WORK!!! WATCH OUT
+    return ret;
+}//tested; seems ok 
 
 void minHeapify ( S_NODE *  heapNode){
     /*

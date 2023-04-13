@@ -123,6 +123,13 @@ int main(){
 
         printInOrderHeap(heap1);
 
+
+  
+  popNode(&(heap1->lchild));
+printf("heap after pop of lchild");
+ printInOrderHeap(heap1);
+
+
     freeSkewHeap(heap1);
     return 0;
 }
