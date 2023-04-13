@@ -158,7 +158,11 @@ int popNode (S_NODE ** heapNodePTR){
     /* 
     frees node passed; merges it's children ; 
     and then merges the result with it's parent
-
+    
+    Assumses that the tree is correctly structued 
+    
+    ie : node->parent->lchild == node || node -> parent ->rchild ==node
+    
     returns 0 if nullptr passed ; should prolly print smtg in stderr
     */
     if(!heapNodePTR) return 0;
