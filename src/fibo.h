@@ -18,6 +18,7 @@ typedef struct list{
     
     unsigned minIndex;
     unsigned nbelem; 
+    unsigned size;
     
 }HEAP_SET;
 

@@ -169,7 +169,7 @@ int popNode (S_NODE ** heapNodePTR){
     int ret=0;
     S_NODE * heapNode = *heapNodePTR;
 
-    if(! heapNode) return 0; 
+    if(! heapNode ) return 0; 
 
     if(!heapNode->parent){ //Case where node given is root
         return popRoot(heapNodePTR);
