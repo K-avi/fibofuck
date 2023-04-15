@@ -52,5 +52,6 @@ extern void incrNode( S_NODE * heapNode );
 /* misc functions */
 
 extern void printInOrderHeap( S_NODE * heapNode);
+extern void heapSize (int * size , S_NODE * root);
 
 #endif

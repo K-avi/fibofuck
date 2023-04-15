@@ -259,3 +259,17 @@ void printInOrderHeap( S_NODE * heapNode) {
     printInOrderHeap(heapNode->rchild);
     
 }
+
+void heapSize (int * size , S_NODE * root){
+    /*
+    tail recursive implem of size of tree primitive
+    */
+
+    if(!root){
+        return;
+    }
+    if(size)(*size)++;
+    heapSize( size, root->lchild); 
+    heapSize(size, root->rchild);
+
+}
