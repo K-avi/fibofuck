@@ -18,7 +18,7 @@ L_ENTRY * initEntry(int key){
         return NULL;
     }
 
-    ret->nbElem=0; 
+    ret->nbElem=1; 
     ret->skHeap=initNode(key);
 
     return ret;
@@ -187,7 +187,7 @@ void insertNode ( HEAP_SET * set, S_NODE * root, int treeSize){
             set->nbRoot++;
         }
    }
-}
+}//not tested
 
 void removeSet(HEAP_SET * set, unsigned index){
     /*
@@ -227,7 +227,7 @@ void updateMin( HEAP_SET * set){
 
     else fprintf(stderr , "warning in updateMin(%p) : empty set\n", set);
     
-}
+}//not tested 
 
 
 int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
@@ -325,17 +325,44 @@ int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
 }//awful ; hellish ; atrocious ; horrible; deletion in O(1) my ass fibo trees are bullshit and I suck
 //not tested; prolly wrong
 
-void increaseKey(HEAP_SET * set, int entry_index, S_NODE*  node){
+void increaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node){
+    /*
+    calls update min to ensure that min is not obsolete ;
+    assumes that node is stored in the tree at entry index
+    */
 
-}
+    if(!set && node) return;
+    if(entry_index> set->size) return;
+    if(!set->entrylist) return;
 
-void decreaseKey(HEAP_SET * set, int entry_index, S_NODE*  node){
-    
-}
+    incrNode(node);
+
+    updateMin(set);
+
+}//not tested
+
+void decreaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node){
+    /*
+    assumes that node is stored at the entry of index entry_index; 
+    checks for new min
+    */
+    if(!set && node) return;
+    if(entry_index> set->size) return;
+    if(!set->entrylist) return;
+
+    decrNode(node);
+
+    if(set->entrylist[entry_index]->skHeap->key< set->entrylist[set->minIndex]->skHeap->key){
+    //sets min if new min
+        set->minIndex= entry_index;
+    }
+}//not tested
 
 void merge ( HEAP_SET * set){
     /*
-    hell.
+    I'm not sure how to approach the merge function tbh
+    I should do smtg similar to fib heaps where there is a relation between the max number 
+    of tree and the max number of elements in the heap
     */
 
     if(!set) return;
