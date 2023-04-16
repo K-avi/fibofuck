@@ -1,4 +1,5 @@
 #include "skew.h"
+#include "fibo.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -6,7 +7,7 @@
 
 int main(){
 
-
+/*
     S_NODE * heap1= initNode(5);
 
    insertHeap(heap1, 2);
@@ -130,6 +131,47 @@ printf("heap after pop of lchild");
  printInOrderHeap(heap1);
 
 
-    freeSkewHeap(heap1);
-    return 0;
+    freeSkewHeap(heap1);*/
+
+  HEAP_SET * set = initSet(5);
+ /*insertKey(set, 2);
+  insertKey(set, 2);
+  insertKey(set, 2);
+  insertKey(set, 2);
+  insertKey(set, 2);
+  insertKey(set, 2);
+  insertKey(set, 2);*/
+
+  S_NODE * n= initNode(5);
+
+  insertHeap(n, 6);
+
+  insertNode(set, n, 2);
+
+  //removeSet( set, 0);
+
+  popSetNode(set, n, 0);
+  decrNode(set->entrylist[0]->skHeap);
+  printf("%d\n", set->entrylist[0]->skHeap->key);
+
+  updateMin(set);
+
+  insertKey(set, -5);
+
+  heapDump(set);
+
+  insertKey(set, 2); 
+  insertKey(set , 3);
+
+  int * sizelist = malloc(10* sizeof(int));
+  for(int i=0 ; i<10; i++){
+    sizelist[i]=-1;
+  }
+  
+  merge(set, sizelist);
+
+  free(sizelist);
+
+  freeSet(set);
+  return 0;
 }

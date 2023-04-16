@@ -253,7 +253,7 @@ void printInOrderHeap( S_NODE * heapNode) {
         return;
     }
     printInOrderHeap(heapNode->lchild);
-    printf(" %d id :%p  par: %p l: %p  r: %p\n", heapNode->key, heapNode, heapNode->parent, heapNode->lchild, heapNode->rchild );
+    printf(" %d id :%p  par: %p l: %p  r: %p\n",  heapNode->key, (void*)heapNode, (void*)heapNode->parent,(void*) heapNode->lchild, (void*)heapNode->rchild );
     printInOrderHeap(heapNode->rchild); 
 }
 

@@ -10,7 +10,7 @@ LFLAGS :=
 
 YACC := bison
 YFLAGS := -d 
-SRCS := exec.c ast.c fibo.c stack.c globals.c cmdline_interp.c skew.c
+SRCS := exec.c ast.c fibo.c stack.c globals.c cmdline_interp.c skew.c fibo.c
 
 all: $(TARGET)
 

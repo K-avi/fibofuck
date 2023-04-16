@@ -24,11 +24,11 @@ L_ENTRY * initEntry(int key){
     ret->skHeap=initNode(key);
 
     return ret;
-}//not tested ; prolly ok
+}//tested ; ok
 
 L_ENTRY* mkEntryNode( S_NODE * node ,int size){
     /*
-    NOT DONE 
+    handles nullptr and malloc error
     */
     
     if(!node){
@@ -46,7 +46,7 @@ L_ENTRY* mkEntryNode( S_NODE * node ,int size){
     ret->nbElem=size; 
 
     return ret;
-}//not done
+}//tested; ok
 
 void freeEntry(L_ENTRY* entry){
     /*
@@ -57,7 +57,7 @@ void freeEntry(L_ENTRY* entry){
 
     if(entry->skHeap) freeSkewHeap(entry->skHeap);
     free(entry);
-}//not tested ; prolly ok
+}// tested ;  ok
 
 /////////////////
 
@@ -71,7 +71,7 @@ HEAP_SET* initSet(unsigned size){
         fprintf(stderr, "error: in initSet(%u) unable to allocate memory for the heapset\n",size);
         return NULL;
     }
-    ret->minIndex=0;
+    ret->minIndex=-1;
     ret->nbelem=0;
     ret->size=0;
     ret->nbRoot=0;
@@ -83,7 +83,7 @@ HEAP_SET* initSet(unsigned size){
         return NULL;
     }
     return ret;
-}//not tested; prolly ok
+}// tested; ok
 
 
 void freeSet(HEAP_SET * set){
@@ -100,7 +100,7 @@ void freeSet(HEAP_SET * set){
     }
     free(set->entrylist); 
     free(set);
-}//not tested; prolly ok
+}//tested; ok prolly ok
 
 
 void reallocSet(HEAP_SET * set, unsigned size){
@@ -121,13 +121,39 @@ void reallocSet(HEAP_SET * set, unsigned size){
         return;
     }
 
-}//not tested
+}//tested; ok
 
 
 /*fibo heap manipulation function */
 
 
 /* heap primitives */
+
+
+void updateMin( HEAP_SET * set){
+    if(!set) return;
+    if(!set->entrylist) return;
+    if(set->nbelem==0){
+        set->minIndex=-1; 
+        return;
+    }
+    int min=INT_MAX , minindex=-1;
+
+    for(unsigned i=0; i<set->size; i++){
+        if(set->entrylist[i]){
+            if(set->entrylist[i]->skHeap->key<min) {
+                min=set->entrylist[i]->skHeap->key;
+                minindex= i;
+            }
+        }
+    }
+
+    if(minindex!=-1)set->minIndex= minindex;
+
+    else fprintf(stderr , "warning in updateMin(%p) : empty set\n",(void*) set);
+    
+}//tested; ok
+
 void insertKey(HEAP_SET * set, int key){
     /*
     checks for nullptr and allocation
@@ -154,13 +180,22 @@ void insertKey(HEAP_SET * set, int key){
 
    for(unsigned i=0; i<set->size; i++){
         if(! set->entrylist[i]){
+
+            if(set->minIndex!=-1){
+                if(key < set->entrylist[set->minIndex]->skHeap->key){
+                    set->minIndex=i;
+                }
+            }
             set->entrylist[i]=newEntry;       
             set->nbelem++;
             set->nbRoot++;
+            break;
         }
    }
+
+   
   
-}//not tested; CHECK IF ITS GOOD ; potential edge cases insertion 
+}//tested ; ok
 // shouldn't need the loop in realloc case
 
 void insertNode ( HEAP_SET * set, S_NODE * root, int treeSize){
@@ -184,12 +219,20 @@ void insertNode ( HEAP_SET * set, S_NODE * root, int treeSize){
                 fprintf(stderr, "failed to initialise memory in insertNode(%p , %p)\n", (void*)set, (void*) root);
                 return;
             }
+            if(set->minIndex!=-1){
+                if(newEntry->skHeap->key < set->entrylist[set->minIndex]->skHeap->key){
+                    set->minIndex=i;
+                }
+            }
             set->entrylist[i]=newEntry;       
-            set->nbelem++;
+            set->nbelem+=treeSize;
             set->nbRoot++;
+            break;
         }
    }
-}//not tested
+
+   
+}// tested ; ok
 
 void removeSet(HEAP_SET * set, unsigned index){
     /*
@@ -204,32 +247,9 @@ void removeSet(HEAP_SET * set, unsigned index){
     set->entrylist[index]=NULL;
     set->nbRoot--;
 
-}//not tested; prolly ok ? document usage properly 
 
-
-void updateMin( HEAP_SET * set){
-    if(!set) return;
-    if(!set->entrylist) return;
-    if(set->nbelem==0){
-        set->minIndex=-1; 
-        return;
-    }
-    int min=INT_MAX , minindex=-1;
-
-    for(unsigned i=0; i<set->size; i++){
-        if(set->entrylist[i]){
-            if(set->entrylist[i]->skHeap->key<min) {
-                min=set->entrylist[i]->skHeap->key;
-                minindex= i;
-            }
-        }
-    }
-
-    if(minindex!=-1)set->minIndex= minindex;
-
-    else fprintf(stderr , "warning in updateMin(%p) : empty set\n", set);
-    
-}//not tested 
+    updateMin(set);
+}//tested ; ok
 
 
 int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
@@ -325,7 +345,7 @@ int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
     return ret;
 
 }//awful ; hellish ; atrocious ; horrible; deletion in O(1) my ass fibo trees are bullshit and I suck
-//not tested; prolly wrong
+//tested; seems ok
 
 void increaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node){
     /*
@@ -341,7 +361,7 @@ void increaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node){
 
     updateMin(set);
 
-}//not tested
+}// tested; ok
 
 void decreaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node){
     /*
@@ -358,7 +378,9 @@ void decreaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node){
     //sets min if new min
         set->minIndex= entry_index;
     }
-}//not tested
+
+    updateMin(set);
+}//tested; ok
 
 
 static inline void reallocsizeList(int * sizeList , unsigned realloc_size){
@@ -376,7 +398,7 @@ static inline void reallocsizeList(int * sizeList , unsigned realloc_size){
     if(!sizeList){
         
         sizeList=NULL;
-        fprintf(stderr, "error in reallocsizeList(%p , %u ) failed to realloc sizeList", errorLpointer, realloc_size);
+        fprintf(stderr, "error in reallocsizeList(%p , %u ) failed to realloc sizeList", (void*) errorLpointer, realloc_size);
         return;   
     }
 
@@ -471,6 +493,35 @@ void merge ( HEAP_SET * set , int * sizeList){
     if(mergeCheck){
         merge(set, sizeList);
     }
+
+    updateMin(set);
    
-}//not tested
-//very likely wrong
+}//tested not ok 
+
+
+void heapDump( HEAP_SET * heap){
+    /*
+    prints a lotta stuff about the heap
+    */
+
+    if(!heap ) return;
+
+    printf("heap of size %u containing %u roots and %u elements\n", heap->size ,heap->nbRoot, heap->nbelem);
+    printf("min index stored at %u\n", heap->minIndex);
+
+
+    if(!heap->entrylist){
+        printf("entry list of the heap is null\n");
+        return;
+    }
+    for(unsigned i=0; i<heap->size; i++){
+        if(!heap->entrylist[i]){
+            printf("entry %u is NULL\n", i);
+        }else{
+            printf("entry %u contains %u elements\n", i,heap->entrylist[i]->nbElem);
+            printInOrderHeap(heap->entrylist[i]->skHeap);
+            printf("\n");
+        }
+    }
+    printf("\n");
+}//tested; ok 
