@@ -1,6 +1,8 @@
 #include "fibo.h"
 #include "skew.h"
+
 #include <limits.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -358,14 +360,117 @@ void decreaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node){
     }
 }//not tested
 
-void merge ( HEAP_SET * set){
+
+static inline void reallocsizeList(int * sizeList , unsigned realloc_size){
     /*
-    I'm not sure how to approach the merge function tbh
-    I should do smtg similar to fib heaps where there is a relation between the max number 
-    of tree and the max number of elements in the heap
+    reallocs the sizeList array of the merge function by adding realloc_size entries to it and initializing 
+    them to -1.
+    */
+    if(!sizeList )return;
+    int NbMaxSizeList= sizeList[0];
+    if(NbMaxSizeList<=0) return;
+
+    int * errorLpointer= sizeList;
+
+    sizeList= realloc(sizeList, realloc_size* sizeof(int));
+    if(!sizeList){
+        
+        sizeList=NULL;
+        fprintf(stderr, "error in reallocsizeList(%p , %u ) failed to realloc sizeList", errorLpointer, realloc_size);
+        return;   
+    }
+
+    for(int i =sizeList[0]; i< (int) sizeList[0]+ (int)realloc_size; i++){
+        sizeList[i]= -1;
+    }
+
+    sizeList[0]+= (int)realloc_size;
+}
+//not tested ; possibly wrong 
+
+void merge ( HEAP_SET * set , int * sizeList){
+    /*
+    the merge function will merge trees containing the same number of nodes. 
+    It will be called until the size of every tree is different 
+
+    sizeList is an array to keep track of the sizes of different trees in the set. 
+
+    at the index sizeList[i]=j  j is the index of an entry set->entrylist[j] containing a tree 
+    of size i 
+
+    sizeList[1]=j means that there is a tree of size 1 in set->entrylist[j] if no reference to an entry is 
+    stored at an index sizeList[i] the value is set to -1
+
+    the size of sizeList is stored at index 0; 
+    sizeList[0] contains the number of elements in sizeList 
+
+    merge will call itself recursively so sizeList needs to be allocated / de allocated after calling the function
     */
 
-    if(!set) return;
+    if(!(set && sizeList)) return;
     if(!set->entrylist) return;
+    int * errorLpointer = sizeList; //used to dump error in failed realloc
 
-}//not done 
+    unsigned char mergeCheck =0; //used to check if a merge occured and call merge recursively if so
+    int sizeListMaxIndex = sizeList[0];
+
+    for(unsigned i=0 ; i<set->size; i++){
+        if( set->entrylist[i]){
+            
+            if(set->entrylist[i]->nbElem > (unsigned) sizeListMaxIndex){ //check for realloc
+                reallocsizeList(sizeList, set->entrylist[i]->nbElem);
+                if(!sizeList) {
+                    fprintf(stderr, "error in merge(%p , %p ) failed to realloc sizeList", (void*)set, (void*) errorLpointer);
+                    return;
+                }
+            }
+            if( sizeList[set->entrylist[i]->nbElem] !=-1){ //merge case
+                /*
+                gotta: 
+                ->merge trees in the 2 entries; 
+                -> set index of sizeList to -1 
+                -> set index of newsize in sizelist to current index 
+                */
+                
+                int heapIndex= sizeList[set->entrylist[i]->nbElem]; //retrieves index
+                sizeList[set->entrylist[i]->nbElem]=-1; //sets the index back to default
+
+                set->entrylist[i]->skHeap= mergeHeaps(set->entrylist[i]->skHeap,  set->entrylist[heapIndex]->skHeap);
+                
+                freeEntry(set->entrylist[heapIndex]); //unsets the entry
+                set->entrylist[heapIndex]=NULL;
+
+                set->entrylist[i]->nbElem*=2; //actualises sizeof tree
+
+                if( (unsigned)sizeList[0]< set->entrylist[i]->nbElem){ //realloc if needed
+                   reallocsizeList(sizeList, set->entrylist[i]->nbElem);
+
+                    if(!sizeList){
+                        fprintf(stderr, "error in merge(%p , %p ) failed to realloc sizeList", (void*)set, (void*) errorLpointer);
+                        return;
+                    }
+                }
+
+                sizeList[set->entrylist[i]->nbElem]= i; //sets index for tree of new size
+
+                mergeCheck=1; 
+            }else{ //set for merge
+
+                if( (unsigned) sizeList[0]< set->entrylist[i]->nbElem){ //realloc if needed
+                    reallocsizeList(sizeList, set->entrylist[i]->nbElem);
+
+                    if(!sizeList){
+                        fprintf(stderr, "error in merge(%p , %p ) failed to realloc sizeList", (void*)set, (void*) errorLpointer);
+                        return;
+                    }
+                }
+                sizeList[set->entrylist[i]->nbElem]=i;
+            }
+        }
+    }
+    if(mergeCheck){
+        merge(set, sizeList);
+    }
+   
+}//not tested
+//very likely wrong

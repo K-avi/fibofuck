@@ -232,7 +232,6 @@ void minHeapify ( S_NODE *  heapNode){
 void incrNode( S_NODE * heapNode){
     /*
     increment a given node by one and heapifies it
-
     checks for nullptr
     */
 
@@ -249,27 +248,23 @@ void incrNode( S_NODE * heapNode){
 
 
 void printInOrderHeap( S_NODE * heapNode) {
-
     if(!heapNode){
         //printf(" (null) ");
         return;
     }
     printInOrderHeap(heapNode->lchild);
     printf(" %d id :%p  par: %p l: %p  r: %p\n", heapNode->key, heapNode, heapNode->parent, heapNode->lchild, heapNode->rchild );
-    printInOrderHeap(heapNode->rchild);
-    
+    printInOrderHeap(heapNode->rchild); 
 }
 
 void heapSize (int * size , S_NODE * root){
     /*
     tail recursive implem of size of tree primitive
     */
-
     if(!root){
         return;
     }
     if(size)(*size)++;
     heapSize( size, root->lchild); 
     heapSize(size, root->rchild);
-
 }
