@@ -142,35 +142,99 @@ printf("heap after pop of lchild");
   insertKey(set, 2);
   insertKey(set, 2);*/
 
-  S_NODE * n= initNode(5);
+ // S_NODE * n= initNode(5);
 
-  insertHeap(n, 6);
+ // insertHeap(n, 6);
 
-  insertNode(set, n, 2);
+ // insertNode(set, n, 2);
 
   //removeSet( set, 0);
 
-  popSetNode(set, n, 0);
-  decrNode(set->entrylist[0]->skHeap);
-  printf("%d\n", set->entrylist[0]->skHeap->key);
+ // popSetNode(set, n, 0);
+ // decrNode(set->entrylist[0]->skHeap);
+  //printf("%d\n", set->entrylist[0]->skHeap->key);
 
-  updateMin(set);
+ // updateMin(set);
 
   insertKey(set, -5);
 
-  heapDump(set);
+ // heapDump(set);
 
   insertKey(set, 2); 
-  insertKey(set , 3);
+  
 
-  int * sizelist = malloc(10* sizeof(int));
-  for(int i=0 ; i<10; i++){
+  
+
+ insertKey(set , 3);
+
+insertKey(set , 12);
+insertKey(set , 3);
+
+insertKey(set , 12);
+insertKey(set , 3);
+
+insertKey(set , 12);
+
+insertKey(set , 3);
+
+insertKey(set , 12);
+insertKey(set , 3);
+
+insertKey(set , 12);
+insertKey(set , 3);
+
+insertKey(set , 12);
+insertKey(set , 3);
+
+insertKey(set , 12);
+insertKey(set , 3);
+
+insertKey(set , 12);
+insertKey(set , 3);
+
+insertKey(set , 12);
+insertKey(set , 3);
+
+insertKey(set , 12);
+insertKey(set , 3);
+
+insertKey(set , 12);
+insertKey(set , 3);
+
+insertKey(set , 12);
+insertKey(set , 3);
+
+insertKey(set , 12);
+
+/*
+
+int * sizelist = malloc(11* sizeof(int));
+  for(int i=0 ; i<11; i++){
     sizelist[i]=-1;
   }
-  
-  merge(set, sizelist);
 
-  free(sizelist);
+ if(sizelist) sizelist[0]=10;*/
+
+  mergeWrapper(set);
+  heapDump(set);
+  //if(sizelist) free(sizelist);
+
+  insertKey(set, 1);
+   insertKey(set, 1);
+    insertKey(set, 1);
+
+     insertKey(set, 1);
+      insertKey(set, 1);
+       insertKey(set, 1);
+
+        insertKey(set, 1);
+         insertKey(set, 1);
+   insertKey(set, 1);
+    insertKey(set, 1);
+     insertKey(set, 1);
+     
+  mergeWrapper(set);
+  heapDump(set);
 
   freeSet(set);
   return 0;
