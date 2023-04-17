@@ -2,9 +2,10 @@
 #define AST_H
 
 #include "parser.tab.h"
+#include <limits.h>
 
 
-typedef unsigned short token;
+typedef unsigned int token;
 struct program ;
 
 typedef struct instruction{ 
@@ -44,7 +45,8 @@ extern void mergeInstruction( instruction * list1, instruction * list2);
 
 extern void free_instruct( instruction * list);
 
-enum {  INT_LCHILD=0 , INT_RCHILD, INT_PARENT , INT_PLUS, INT_MINUS, INT_PRINT, INT_READ, INT_LBRACKET, INT_RBRACKET, INT_HEAPD, INT_POP, INT_CREATE , INT_DPRINT};
+enum {  INT_LTREE=0 , INT_RTREE, INT_LCHILD , INT_RCHILD, INT_PARENT , INT_PLUS, INT_MINUS, 
+ INT_LBRACKET, INT_RBRACKET, INT_READ, INT_CREATE , INT_MERGE, INT_RMTREE,  INT_POP, INT_HEAPD,  INT_PRINT, INT_DPRINT};
 
 
 #endif

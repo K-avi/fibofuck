@@ -159,234 +159,6 @@ void updateMin( HEAP_SET * set){
     
 }//tested; ok
 
-void insertKey(HEAP_SET * set, int key){
-    /*
-    checks for nullptr and allocation
-    handles reallocation!
-    */
-
-   if(!set) return;
-
-   if(set->size==set->nbRoot){
-        
-        reallocSet(set, _set_realloc_default);
-        if(!set->entrylist){
-            fprintf(stderr, "error in insertSet(%p , %d) realloc failed\n", (void*)set,key);
-            return;
-        }
-   }
-
-   L_ENTRY * newEntry = initEntry(key);
-  
-   if(!newEntry){
-        fprintf(stderr, "error: in insertSet(%p, %d) couldn't allocate memory for new entry\n", (void*) set, key);
-        return;
-   }
-
-   for(unsigned i=0; i<set->size; i++){
-        if(! set->entrylist[i]){
-
-            if(set->minIndex!=-1){
-                if(key < set->entrylist[set->minIndex]->skHeap->key){
-                    set->minIndex=i;
-                }
-            }
-            set->entrylist[i]=newEntry;       
-            set->nbelem++;
-            set->nbRoot++;
-            break;
-        }
-   }
-
-   
-  
-}//tested ; ok
-// shouldn't need the loop in realloc case
-
-void insertNode ( HEAP_SET * set, S_NODE * root, int treeSize){
-    /*
-    complexity of this is weird; checking for empty node and realloc makes it 
-    O(nb_roots²)
-    */
-    if(! set && root) return;
-    
-    if(set->size==set->nbRoot){  
-        reallocSet(set, _set_realloc_default);
-        if(!set->entrylist){
-            fprintf(stderr, "error in insertSet(%p , %p) realloc failed\n", (void*)set,(void*)root);
-            return;
-        }
-   }
-   for(unsigned i=0; i<set->size; i++){
-        if(! set->entrylist[i]){
-            L_ENTRY * newEntry = mkEntryNode(root, treeSize);
-            if(!newEntry){
-                fprintf(stderr, "failed to initialise memory in insertNode(%p , %p)\n", (void*)set, (void*) root);
-                return;
-            }
-            if(set->minIndex!=-1){
-                if(newEntry->skHeap->key < set->entrylist[set->minIndex]->skHeap->key){
-                    set->minIndex=i;
-                }
-            }
-            set->entrylist[i]=newEntry;       
-            set->nbelem+=treeSize;
-            set->nbRoot++;
-            break;
-        }
-   }
-
-   
-}// tested ; ok
-
-void removeSet(HEAP_SET * set, unsigned index){
-    /*
-    frees the entry at a given index; 
-    DOESNT FREE TREE OF THE ENTRY ONLY USE AFTER MERGE!!!
-    */
-    if(!set) return;
-    if(!set->entrylist) return;
-    if(set->size<=index) return;
-
-    free(set->entrylist[index]);
-    set->entrylist[index]=NULL;
-    set->nbRoot--;
-
-
-    updateMin(set);
-}//tested ; ok
-
-
-int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
-    /*
-    assumes that the node to pop is actually in the entry of the set 
-
-    checks for nullptr. 
-    The pop is in O(1) cuz it's similar to the Fibonnaci Heap pop. 
-
-    what happens is that the node passed is freed and it's children (if they exist) become new trees in 
-    the heap set 
-
-    the function return the key stored at the node if succesfull and zero on error 
-    */
-
-    if(!set )return 0;
-    if(entry_index> set->size) return 0;
-    if(set->nbelem==0) return 0;
-
-    L_ENTRY* entry = set->entrylist[entry_index];
-
-    if(!(node && entry)) return 0;
-
-
-    set->nbelem--; //decrease nbelem before actually deleting it to make call to update min acurate
-
-    int ret= node->key;
-    if(!node->parent){ //case where node is the root of the entry 
-  
-        //this if sucks ass
-        if(node->lchild && node->rchild){ //both not null
-            
-            node->lchild->parent=node->rchild->parent=NULL;
-            int sizeL, sizeR; 
-
-            heapSize(&sizeL, node->lchild);
-            heapSize(&sizeR, node->rchild);
-
-            entry->nbElem= sizeL; //replaces tree in entry by left child
-            entry->skHeap= node->lchild;
-
-            insertNode(set, node->rchild, sizeR); //inserts rchild in the heap
-            
-
-        }else if(node->lchild){  //only lchild
-            node->lchild->parent=NULL;
-
-            entry->nbElem--;  //bc if no right child only root is popped etc
-            entry->skHeap= node->lchild; 
-        }else if(node->rchild){ //only rchild
-            
-            node->rchild->parent=NULL;
-
-            entry->nbElem--;  //bc if no right child only root is popped etc
-            entry->skHeap= node->lchild; 
-        }else{ //both are null
-        //frees entry and set stuff to null
-            freeEntry(entry);
-            set->entrylist[entry_index]=NULL;
-        }
-
-        if((int)entry_index==set->minIndex){ //updates min in set if necessary
-            updateMin(set);
-        }   
-
-    }else{ //node passed isn't the root of a tree
-        
-        if(node->parent->lchild==node){ //unsets it's parent
-            node->parent->lchild = NULL;
-        }else{
-            node->parent->rchild=NULL;
-        }
-        
-        if(node->lchild){
-            node->lchild->parent=NULL; 
-
-            int sizeL;
-
-            heapSize(&sizeL, node->lchild);
-            insertNode(set, node->lchild, sizeL);
-        }
-        if(node->rchild){
-            node->rchild->parent=NULL; 
-
-            int sizeR;
-
-            heapSize(&sizeR, node->lchild);
-            insertNode(set, node->rchild, sizeR);
-        }
-    }
-
-    free(node);
-    return ret;
-
-}//awful ; hellish ; atrocious ; horrible; deletion in O(1) my ass fibo trees are bullshit and I suck
-//tested; seems ok
-
-void increaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node){
-    /*
-    calls update min to ensure that min is not obsolete ;
-    assumes that node is stored in the tree at entry index
-    */
-
-    if(!set && node) return;
-    if(entry_index> set->size) return;
-    if(!set->entrylist) return;
-
-    incrNode(node);
-
-    updateMin(set);
-
-}// tested; ok
-
-void decreaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node){
-    /*
-    assumes that node is stored at the entry of index entry_index; 
-    checks for new min
-    */
-    if(!set && node) return;
-    if(entry_index> set->size) return;
-    if(!set->entrylist) return;
-
-    decrNode(node);
-
-    if(set->entrylist[entry_index]->skHeap->key< set->entrylist[set->minIndex]->skHeap->key){
-    //sets min if new min
-        set->minIndex= entry_index;
-    }
-
-    updateMin(set);
-}//tested; ok
-
 
 static inline int * reallocsizeList(int * sizeList , unsigned realloc_size){
     /*
@@ -540,6 +312,236 @@ void mergeWrapper( HEAP_SET * set){
     free(sizeArrPtr);
 }//tested ok
 
+void insertKey(HEAP_SET * set, int key){
+    /*
+    checks for nullptr and allocation
+    handles reallocation!
+    */
+
+   if(!set) return;
+
+   if(set->size==set->nbRoot){
+        
+        reallocSet(set, _set_realloc_default);
+        if(!set->entrylist){
+            fprintf(stderr, "error in insertSet(%p , %d) realloc failed\n", (void*)set,key);
+            return;
+        }
+   }
+
+   L_ENTRY * newEntry = initEntry(key);
+  
+   if(!newEntry){
+        fprintf(stderr, "error: in insertSet(%p, %d) couldn't allocate memory for new entry\n", (void*) set, key);
+        return;
+   }
+
+   for(unsigned i=0; i<set->size; i++){
+        if(! set->entrylist[i]){
+
+            if(set->minIndex!=-1){
+                if(key < set->entrylist[set->minIndex]->skHeap->key){
+                    set->minIndex=i;
+                }
+            }
+            set->entrylist[i]=newEntry;       
+            set->nbelem++;
+            set->nbRoot++;
+            break;
+        }
+   }
+
+   mergeWrapper(set);
+  
+}//tested ; ok
+// shouldn't need the loop in realloc case
+
+void insertNode ( HEAP_SET * set, S_NODE * root, int treeSize){
+    /*
+    complexity of this is weird; checking for empty node and realloc makes it 
+    O(nb_roots²)
+    */
+    if(! set && root) return;
+    
+    if(set->size==set->nbRoot){  
+        reallocSet(set, _set_realloc_default);
+        if(!set->entrylist){
+            fprintf(stderr, "error in insertSet(%p , %p) realloc failed\n", (void*)set,(void*)root);
+            return;
+        }
+   }
+   for(unsigned i=0; i<set->size; i++){
+        if(! set->entrylist[i]){
+            L_ENTRY * newEntry = mkEntryNode(root, treeSize);
+            if(!newEntry){
+                fprintf(stderr, "failed to initialise memory in insertNode(%p , %p)\n", (void*)set, (void*) root);
+                return;
+            }
+            if(set->minIndex!=-1){
+                if(newEntry->skHeap->key < set->entrylist[set->minIndex]->skHeap->key){
+                    set->minIndex=i;
+                }
+            }
+            set->entrylist[i]=newEntry;       
+            set->nbelem+=treeSize;
+            set->nbRoot++;
+            break;
+        }
+   }
+
+   mergeWrapper(set);
+}// tested ; ok
+
+void removeSet(HEAP_SET * set, unsigned index){
+    /*
+    frees the entry at a given index; 
+    DOESNT FREE TREE OF THE ENTRY ONLY USE AFTER MERGE!!!
+    */
+    if(!set) return;
+    if(!set->entrylist) return;
+    if(set->size<=index) return;
+
+    free(set->entrylist[index]);
+    set->entrylist[index]=NULL;
+    set->nbRoot--;
+
+
+    mergeWrapper(set);
+    updateMin(set);
+
+}//tested ; ok
+
+
+int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
+    /*
+    assumes that the node to pop is actually in the entry of the set 
+
+    checks for nullptr. 
+    The pop is in O(1) cuz it's similar to the Fibonnaci Heap pop. 
+
+    what happens is that the node passed is freed and it's children (if they exist) become new trees in 
+    the heap set 
+
+    the function return the key stored at the node if succesfull and zero on error 
+    */
+
+    if(!set )return 0;
+    if(entry_index> set->size) return 0;
+    if(set->nbelem==0) return 0;
+
+    L_ENTRY* entry = set->entrylist[entry_index];
+
+    if(!(node && entry)) return 0;
+
+
+    set->nbelem--; //decrease nbelem before actually deleting it to make call to update min acurate
+
+    int ret= node->key;
+    if(!node->parent){ //case where node is the root of the entry 
+  
+        //this if sucks ass
+        if(node->lchild && node->rchild){ //both not null
+            
+            node->lchild->parent=node->rchild->parent=NULL;
+            int sizeL, sizeR; 
+
+            heapSize(&sizeL, node->lchild);
+            heapSize(&sizeR, node->rchild);
+
+            entry->nbElem= sizeL; //replaces tree in entry by left child
+            entry->skHeap= node->lchild;
+
+            insertNode(set, node->rchild, sizeR); //inserts rchild in the heap
+            
+
+        }else if(node->lchild){  //only lchild
+            node->lchild->parent=NULL;
+
+            entry->nbElem--;  //bc if no right child only root is popped etc
+            entry->skHeap= node->lchild; 
+        }else if(node->rchild){ //only rchild
+            
+            node->rchild->parent=NULL;
+
+            entry->nbElem--;  //bc if no right child only root is popped etc
+            entry->skHeap= node->lchild; 
+        }else{ //both are null
+        //frees entry and set stuff to null
+            freeEntry(entry);
+            set->entrylist[entry_index]=NULL;
+        }
+
+        if((int)entry_index==set->minIndex){ //updates min in set if necessary
+            updateMin(set);
+        }   
+
+    }else{ //node passed isn't the root of a tree
+        
+        if(node->parent->lchild==node){ //unsets it's parent
+            node->parent->lchild = NULL;
+        }else{
+            node->parent->rchild=NULL;
+        }
+        
+        if(node->lchild){
+            node->lchild->parent=NULL; 
+
+            int sizeL;
+
+            heapSize(&sizeL, node->lchild);
+            insertNode(set, node->lchild, sizeL);
+        }
+        if(node->rchild){
+            node->rchild->parent=NULL; 
+
+            int sizeR;
+
+            heapSize(&sizeR, node->lchild);
+            insertNode(set, node->rchild, sizeR);
+        }
+    }
+
+    free(node);
+    mergeWrapper(set);
+    return ret;
+
+}//awful ; hellish ; atrocious ; horrible; deletion in O(1) my ass fibo trees are bullshit and I suck
+//tested; seems ok
+
+void increaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node){
+    /*
+    calls update min to ensure that min is not obsolete ;
+    assumes that node is stored in the tree at entry index
+    */
+
+    if(!set && node) return;
+    if(entry_index> set->size) return;
+    if(!set->entrylist) return;
+
+    incrNode(node);
+    mergeWrapper(set);
+    updateMin(set);
+
+}// tested; ok
+
+void decreaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node){
+    /*
+    assumes that node is stored at the entry of index entry_index; 
+    checks for new min
+    */
+    if(!set && node) return;
+    if(entry_index> set->size) return;
+    if(!set->entrylist) return;
+
+    decrNode(node);
+
+    if(set->entrylist[entry_index]->skHeap->key< set->entrylist[set->minIndex]->skHeap->key){
+    //sets min if new min
+        set->minIndex= entry_index;
+    }
+    mergeWrapper(set);
+    updateMin(set);
+}//tested; ok
 
 
 void heapDump( HEAP_SET * heap){

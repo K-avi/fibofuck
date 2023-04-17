@@ -1,3 +1,4 @@
+#include "environment.h"
 #include "fibo.h"
 #include "stack.h"
 #include "globals.h"
@@ -22,7 +23,7 @@ void sigint_handler( int sig){
     }
  
     if(stack) free_stack(stack);
-
+    if(environment) freeEnv(environment);
 
     yylex_destroy();
     printf("\n");
@@ -42,7 +43,7 @@ int main(int argc, char ** argv){
     char* filename = NULL;
     int c;
 
-    printf("heapfuck Copyright (C) 2023  Ivan MULOT-RADOJCIC\nThis program comes with ABSOLUTELY NO WARRANTY;\nfor details see the GPLv3 documentation.\nThis is free software, and you are welcome to redistribute it under certain conditions\n\n");
+    printf("fibofuck Copyright (C) 2023  Ivan MULOT-RADOJCIC\nThis program comes with ABSOLUTELY NO WARRANTY;\nfor details see the GPLv3 documentation.\nThis is free software, and you are welcome to redistribute it under certain conditions\n\n");
 
     while ((c = getopt(argc, argv, "hcf:")) != -1) {
         
@@ -78,28 +79,26 @@ int main(int argc, char ** argv){
     }
 
     if(helpset){
-
         printf("fibofuck is a brainfuck like esolang; the options available are:\n-f to read a file\n-c to use the command line interactive interpret\nmore informations on the fibofuck language can be found in the README.txt and docu/docu.html files.\n"); 
-
         exit(0);
-
     }
-
     
     /*initialising environment and stack ; prog is initialised by parser.tab.c*/
    
     stack= init_stack(STACK_SIZE);
- 
+    environment= initEnv(_set_size_default);
     
 
     if (cmdline_mode) {
 
-         interactive_interp( );
+         interactive_interp( environment, stack);
         
          /*freeing everything after exec*/
      
          free_stack(stack);
+         freeEnv(environment);
          free_prog(prog);
+
          return 0;
          
     }else if(file_mode){
@@ -113,12 +112,13 @@ int main(int argc, char ** argv){
         progempty=0;
         fclose(yyin);
 
-        exec();
+        exec(prog, environment, stack, NULL);
 
         /*freeing everything after exec*/
       
         free_stack(stack);
         free_prog(prog);
+        freeEnv(environment);
         
         progempty=1;
 

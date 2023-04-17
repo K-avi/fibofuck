@@ -9,19 +9,30 @@
 %%
 
 [ \t\n]+    { ; }
-"."         { return TOKEN(PRINT); }
-","         { return TOKEN(READ); }
-">"         { return TOKEN(RCHILD); }
-"<"         { return TOKEN(LCHILD); }
+
+">"         { return TOKEN(RTREE); }
+"<"         { return TOKEN(LTREE); }
+
 "^"         { return TOKEN(PARENT); }
+"/"         { return TOKEN(LCHILD); }
+"\\"         { return TOKEN(RCHILD); }
+
 "+"         { return TOKEN(PLUS); }
 "-"         { return TOKEN(MINUS); }
+
 "["         { return TOKEN(LBRACKET); }
 "]"         { return TOKEN(RBRACKET); }
-"#"         { return TOKEN(HEAP_DUMP);}
+
 "!"         { return TOKEN(POP); }
+"*"         { return TOKEN(RMTREE);}
+
 "%"         {return TOKEN(CREATE);}
+","         { return TOKEN(READ); }
+"?"         { return TOKEN(MERGE); }
+
 ":"         { return TOKEN(DPRINT);}
+"."         { return TOKEN(PRINT); }
+"#"         { return TOKEN(HEAP_DUMP);}
 
 .           { ; }
 

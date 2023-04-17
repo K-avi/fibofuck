@@ -12,7 +12,7 @@ typedef struct entry{
 }L_ENTRY;
 
 
-typedef struct list{
+typedef struct hset{
 
     L_ENTRY** entrylist; 
     
@@ -23,7 +23,9 @@ typedef struct list{
     
 }HEAP_SET;
 
+/*  remove entry */
 
+extern void freeEntry(L_ENTRY* entry);
 /* heap allocation */
 extern HEAP_SET* initSet(unsigned size);
 extern void freeSet(HEAP_SET * set);

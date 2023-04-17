@@ -142,11 +142,11 @@ printf("heap after pop of lchild");
   insertKey(set, 2);
   insertKey(set, 2);*/
 
- // S_NODE * n= initNode(5);
+  S_NODE * n= initNode(5);
 
- // insertHeap(n, 6);
+ insertHeap(n, 6);
 
- // insertNode(set, n, 2);
+  insertNode(set, n, 2);
 
   //removeSet( set, 0);
 
@@ -233,7 +233,7 @@ int * sizelist = malloc(11* sizeof(int));
     insertKey(set, 1);
      insertKey(set, 1);
      
-  mergeWrapper(set);
+ // mergeWrapper(set);
   heapDump(set);
 
   freeSet(set);

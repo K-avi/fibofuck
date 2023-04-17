@@ -24,19 +24,21 @@ void free_instruct ( instruction * instruct){
 int bison_token_to_internal( int token){
     /*
     converts flex/bison generated token to internal rep; 
-    
     returns -1 on invalid tokens
-
     */
  
     switch (token){
+
+        case RTREE : return INT_RTREE;
+        case LTREE : return INT_LTREE;
 
         case LCHILD : return INT_LCHILD; break;
         case RCHILD : return INT_RCHILD; break;
         case PARENT: return INT_PARENT; break;
 
-        case PRINT: return INT_PRINT; break;
+        case CREATE : return INT_CREATE ; break;
         case READ: return INT_READ; break;
+        case MERGE : return INT_MERGE; break;
 
         case PLUS: return INT_PLUS; break;
         case MINUS: return INT_MINUS; break;
@@ -44,11 +46,13 @@ int bison_token_to_internal( int token){
         case LBRACKET: return INT_LBRACKET; break;
         case RBRACKET: return INT_RBRACKET; break;
 
-        case HEAP_DUMP : return INT_HEAPD; break;
+        
         case POP : return INT_POP; break; 
-
-        case CREATE : return INT_CREATE ; break;
+        case RMTREE: return INT_RMTREE; break;
+        
+        case PRINT: return INT_PRINT; break;
         case DPRINT : return INT_DPRINT; break;
+        case HEAP_DUMP : return INT_HEAPD; break;
       
         default: return -1; 
         
@@ -58,13 +62,15 @@ int bison_token_to_internal( int token){
 }// tested; works
 
 
-
-
 char token_to_char(int token){
     
     switch (token) {
-    case INT_LCHILD : return '<'; break;
-    case INT_RCHILD: return '>'; break;
+
+    case INT_RTREE : return '>'; break;
+    case INT_LTREE : return '<'; break;
+
+    case INT_LCHILD : return '/'; break;
+    case INT_RCHILD: return '\\'; break;
     case INT_PARENT : return '^'; break;
  
     case INT_PLUS : return '+'; break;
@@ -72,16 +78,16 @@ char token_to_char(int token){
    
     case INT_LBRACKET : return '['; break;
     case INT_RBRACKET : return ']'; break;
-   
-    case INT_READ: return ','; break;
-    case INT_PRINT: return '.'; break;
-
-    case INT_HEAPD : return '#'; break;
-
+    
     case INT_POP : return '!'; break;
+    case INT_RMTREE : return '*' ; break;
 
+    case INT_READ: return ','; break;
     case INT_CREATE : return '%'; break;
+    case INT_MERGE : return '?' ; break;
 
+    case INT_PRINT: return '.'; break;
+    case INT_HEAPD : return '#'; break;
     case INT_DPRINT : return ':'; break;
  
     default : return 'x'; break;
@@ -90,14 +96,17 @@ char token_to_char(int token){
     return 'x';
 }//not tested but should be ok
 
+
 instruction * mkinstruction( token tok){
     /*
     */
 
-  //  printf("reached mkinstr %d\n", tok);
+    printf("reached mkinstr %d\n", tok);
     instruction * ret = (instruction*) malloc(sizeof(instruction));
 
     ret->tok= bison_token_to_internal(tok);
+
+    printf("ret-> tok is %d\n", ret->tok);
     ret->next=NULL;
     ret->prev=NULL; 
 
@@ -140,6 +149,7 @@ void insertTail( program * prog, instruction * newT){
     /*
     not used atm ; might be relevant later?
     */
+    printf("reached insertTail at %p , %p %d ", prog, newT, newT->tok);
     if(! (newT && prog) ) return;
     newT->next=NULL;
 
