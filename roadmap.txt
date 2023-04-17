@@ -1,8 +1,0 @@
-
--> fix loops 
-	-> done
- 
--> make it scale better -> dont reallocate the fucking size array at every fucking call
-	-> done i think
--> do docu 
--> write test programs
