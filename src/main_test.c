@@ -236,6 +236,12 @@ int * sizelist = malloc(11* sizeof(int));
  // mergeWrapper(set);
   heapDump(set);
 
+
+popSetNode(set, set->entrylist[0]->skHeap, 0 );
+
+heapDump(set);
+
+printf("%u", (unsigned)-1);
   freeSet(set);
   return 0;
 }

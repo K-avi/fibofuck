@@ -46,7 +46,7 @@ extern void mergeInstruction( instruction * list1, instruction * list2);
 extern void free_instruct( instruction * list);
 
 enum {  INT_LTREE=0 , INT_RTREE, INT_LCHILD , INT_RCHILD, INT_PARENT , INT_PLUS, INT_MINUS, 
- INT_LBRACKET, INT_RBRACKET, INT_READ, INT_CREATE , INT_MERGE, INT_RMTREE,  INT_POP, INT_HEAPD,  INT_PRINT, INT_DPRINT};
+ INT_LBRACKET, INT_RBRACKET, INT_READ, INT_CREATE ,  INT_RMTREE,  INT_POP, INT_HEAPD,  INT_PRINT, INT_DPRINT};
 
 
 #endif

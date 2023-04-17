@@ -112,7 +112,7 @@ int main(int argc, char ** argv){
         progempty=0;
         fclose(yyin);
 
-        exec(prog, environment, stack, NULL);
+        exec(environment, stack, prog, NULL);
 
         /*freeing everything after exec*/
       

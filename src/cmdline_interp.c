@@ -1,4 +1,5 @@
 #include "cmdline_interp.h"
+#include "ast.h"
 #include "environment.h"
 #include "fibo.h"
 #include "stack.h"
@@ -52,22 +53,19 @@ void interactive_interp(S_ENVIRONMENT * environment, S_STACK * stack ){
             break;
          }
 
-        printf("before call to yy_scan\n");
         yy_scan_string(line);
-         printf("before call to yyparse\n");
+
         progempty=0;
         syntax_err= yyparse(); 
 
-         printf("after calls\n");
-         printf("syntax err: %d\n", syntax_err);
          if(!syntax_err) {
    
-            printf("reached exec call int cmdline interp\n");
-            printf("prog %p\n", (void*)prog);
-            exec(prog, environment, stack, &printcheck);
+            exec(environment, stack, prog, &printcheck);
+            
             free_prog(prog);
             prog=NULL;
          }
+
          progempty=1;    
          yylex_destroy();
 

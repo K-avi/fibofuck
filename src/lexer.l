@@ -28,7 +28,6 @@
 
 "%"         {return TOKEN(CREATE);}
 ","         { return TOKEN(READ); }
-"?"         { return TOKEN(MERGE); }
 
 ":"         { return TOKEN(DPRINT);}
 "."         { return TOKEN(PRINT); }

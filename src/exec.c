@@ -19,10 +19,7 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
   will prolly be similar to heapfuck/exec.c
   */
 
-  printf("reached exec\n");
-  printprgm(progr);
-  printf("%u\n", progr->head->tok);
- 
+  
   if(!( environment && stack && progr)){
     return -1;
   }
@@ -32,7 +29,6 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
   if(!set ) return -2;
 
   instruction * curr= progr->head;
-  printf("curr %p %p\n", curr, curr->next);
   
   unsigned short stack_ptr = 0;
 
@@ -41,9 +37,8 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
 
   char safe_getchar[256]; //used in read function to pass stuff safely
   while (curr) {
-  printf("reached while curr %p\n", (void*) curr);
+ 
     unsigned  tok= curr->tok;
-    printf("tok is %u\n", tok);
    
     switch (tok) { 
       case INT_RTREE : 
@@ -59,14 +54,14 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
       break; 
       case INT_LTREE :
             if(curTree==-1) break;
-            for (int i=curTree; i> 0; i-- ){
-                
+            for (int i=curTree; i> 0; i-- ){   
                 if(set->entrylist[i]){
                   curTree=i; 
                   curnode = set->entrylist[i]->skHeap;
                   break;
                 }
             }
+            
       break;
 
       case INT_LCHILD : if(curnode) {if(curnode->lchild) curnode=curnode->lchild ;} break;
@@ -116,8 +111,20 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
                   
                   if(curnode->lchild || curnode->rchild){ 
                   //at least a child so a new root will be set in the entry
+printf("reached root pop case \n");
                       popSetNode(set, curnode, curTree);
-                      curnode=set->entrylist[curTree]->skHeap;
+printf(" set entryl cur %p\n",(void*)set->entrylist[curTree]);
+
+                     if(set->entrylist[curTree]) curnode=set->entrylist[curTree]->skHeap;
+                     else{
+                        for(unsigned i=0; i<set->size ; i++){//finds another tree
+                          if(set->entrylist[i]){
+                            curTree=i; 
+                            curnode=set->entrylist[i]->skHeap;
+                            break;
+                          }
+                        }
+                     }
                   }else{ //no children so will have to set node afterwards
                       popSetNode(set, curnode, curTree);
                       curTree=-1; 
@@ -160,21 +167,21 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
 
       case INT_CREATE : 
           insertKey(set, 0);
-          if(!curnode){
-              for(unsigned i=0; i<set->size; i++){
-                if(set->entrylist[i]){
-                  curTree= i; 
-                  curnode= set->entrylist[i]->skHeap;
-                  break;
-                }
-              }
+          
+          for(unsigned i=0; i<set->size; i++){
+            if(set->entrylist[i]){
+                curTree= i; 
+                curnode= set->entrylist[i]->skHeap;
+                break;
+           }
           }
+          
       break;
       case INT_READ :
             memset(safe_getchar, 0, 256);
             if(fgets(safe_getchar, 256, stdin)){
                 insertKey(set, safe_getchar[0]);
-                if(!curnode){
+                
                     for(unsigned i=0; i<set->size; i++){
                       if(set->entrylist[i]){
                         curTree= i; 
@@ -182,50 +189,36 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
                         break;
                       }
                     }
-                }
+                
             }else{
               fprintf(stderr, "error in exec: failed to read from stdin");
             }
       
-      break;
-      case INT_MERGE :
-            mergeWrapper(set);
-            if(! set->entrylist[curTree]){
-                for(unsigned i=0; i<set->size; i++){
-                      if(set->entrylist[i]){
-                        curTree= i; 
-                        curnode= set->entrylist[i]->skHeap;
-                        break;
-                      }
-                }
-            }
-            
       break;
 
       case INT_PRINT :
           if(curnode) printf("%c", curnode->key);
           if(printcheck) *printcheck=1;
       break;
+
       case INT_DPRINT :  
         if(curnode) printf("%d", curnode->key); 
         if(printcheck) *printcheck=1;
       break;
+
       case INT_HEAPD : 
-        heapDump(set); 
+        envDump(environment);
         if(printcheck) *printcheck=1;
       break;
       
       default: break;
     }
-    printf("reached curr = curr next\n");
     curr=curr->next;
   }
 
   environment->curnode= curnode; 
   environment->curTree = curTree;
- 
 
   return 0;
-
 }//not finished; implement handling of empty heap 
 //implement deletion /insertion operations 

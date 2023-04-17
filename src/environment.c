@@ -25,7 +25,7 @@ S_ENVIRONMENT * initEnv(unsigned size){
     ret->curTree=-1;
     
     return ret;
-}//not tested ; prolly ok
+}//tested ; ok
 
 
 void freeEnv(S_ENVIRONMENT * env){
@@ -41,4 +41,27 @@ void freeEnv(S_ENVIRONMENT * env){
 
     free(env);
     return;
-}// not tested ; prolly ok
+}//  tested ;  ok
+
+
+void envDump( S_ENVIRONMENT * env){
+    /*
+    calls heapdump and gives info on the tree pointer and node pointer
+    */
+
+    if(!env){
+         printf("NULL passed in envDump()\n");
+         return;
+    }
+    
+    if(env->curnode) printf("node ptr in env set to node of id %p , containing key %d , parent is %p",
+    (void*) env->curnode, env->curnode->key ,(void*) env->curnode->parent);
+
+    else printf("node ptr is NULL\n");
+
+    if(env->curTree!=-1) printf("tree pointer is set to %d\n", env->curTree);
+    else printf("tree pointer set to default");
+
+    heapDump(env->heap_set);
+    
+}//tested ok 

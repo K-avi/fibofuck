@@ -11,4 +11,6 @@ typedef struct env{
 
 extern S_ENVIRONMENT * initEnv(unsigned size);
 extern void freeEnv(S_ENVIRONMENT * env);
+extern void envDump( S_ENVIRONMENT * env);
+
 #endif

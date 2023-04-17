@@ -4,8 +4,9 @@
 #include "ast.h"
 #include "fibo.h"
 #include "stack.h"
+#include "environment.h"
 
-extern int exec();
+extern int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsigned char * printcheck);
 
 
 

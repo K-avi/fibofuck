@@ -27,7 +27,7 @@
   struct program * prog;
 }
 
-%token <token> RTREE LTREE LCHILD RCHILD PARENT PLUS MINUS POP RMTREE CREATE READ MERGE DPRINT PRINT HEAP_DUMP
+%token <token> RTREE LTREE LCHILD RCHILD PARENT PLUS MINUS POP RMTREE CREATE READ DPRINT PRINT HEAP_DUMP
 %token <token> LBRACKET RBRACKET
 
 
@@ -45,7 +45,7 @@
 
 
 program
-  : stmts { prog=initProg();  progMerge(prog, $1);  }
+  : stmts { prog=initProg();  progMerge(prog, $1); }
   | %empty { ; }
 ;
 
@@ -54,7 +54,7 @@ program
 
 stmts
   : stmt    { $$ = $1; }
-  | stmts stmt  { printf("reached merge case\n"); mergeInstruction($$ = $1, $2); }
+  | stmts stmt  { mergeInstruction($$ = $1, $2); }
   | stmts error { free_instruct($1) ; $$=NULL; yyerror("stmts error"); YYABORT; }
 
 
@@ -106,7 +106,6 @@ op
 
   | READ
   | CREATE
-  | MERGE
 
   | DPRINT
   | PRINT

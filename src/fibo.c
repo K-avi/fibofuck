@@ -82,6 +82,10 @@ HEAP_SET* initSet(unsigned size){
         free(ret);
         return NULL;
     }
+
+    for(unsigned i=0; i<size; i++){
+        ret->entrylist[i]=NULL;
+    }
     return ret;
 }// tested; ok
 
@@ -180,11 +184,12 @@ static inline int * reallocsizeList(int * sizeList , unsigned realloc_size){
         fprintf(stderr, "error in reallocsizeList(%p , %u ) failed to realloc sizeList", (void*) errorLpointer, realloc_size);
         return NULL;   
     }
-
-    for(int i =sizeList[0]; i< (int) sizeList[0]+ (int)realloc_size; i++){
+    printf("realloc size %u , szl[0] %d\n", realloc_size, sizeList[0]);
+    for(int i =sizeList[0]; i< ((int)sizeList[0]+(int)realloc_size) ; i++){
+        printf("in realloc i= %d realloc size = %u", i, realloc_size);
         sizeList[i]= -1;
     }
-
+   
     sizeList[0]+= (int)realloc_size;
 
     return  sizeList;
@@ -218,12 +223,12 @@ void merge ( HEAP_SET * set , int ** sizeListPtr){
     int * errorLpointer = sizeList; //used to dump error in failed realloc
 
     unsigned char mergeCheck =0; //used to check if a merge occured and call merge recursively if so
-    int sizeListMaxIndex = sizeList[0];
+    
 
     for(unsigned i=0 ; i<set->size; i++){
         if( set->entrylist[i]){
-            
-            if(set->entrylist[i]->nbElem > (unsigned) sizeListMaxIndex){ //check for realloc
+            if(set->entrylist[i]->nbElem > (unsigned) sizeList[0]){ //check for realloc
+          
                 sizeList=reallocsizeList(sizeList, set->entrylist[i]->nbElem);
                 if(!sizeList) {
                     fprintf(stderr, "error in merge(%p , %p ) failed to realloc sizeList", (void*)set, (void*) errorLpointer);
@@ -238,7 +243,7 @@ void merge ( HEAP_SET * set , int ** sizeListPtr){
                 -> set index of sizeList to -1 
                 -> set index of newsize in sizelist to current index 
                 */
-             // printf(" at i= %u reached merge condition\n",i);  
+           
                 int heapIndex= sizeList[set->entrylist[i]->nbElem]; //retrieves index
                 
                 sizeList[set->entrylist[heapIndex]->nbElem]=-1; //sets the index back to default
@@ -246,14 +251,12 @@ void merge ( HEAP_SET * set , int ** sizeListPtr){
                 set->entrylist[i]->skHeap= mergeHeaps(set->entrylist[i]->skHeap,  set->entrylist[heapIndex]->skHeap);
                 set->entrylist[i]->nbElem+=set->entrylist[heapIndex]->nbElem;
 
-
-            //printf("new heap size = %u\n", set->entrylist[i]->nbElem);
                 removeSet(set, heapIndex); //unsets the entry
                 set->entrylist[heapIndex]=NULL;
 
                 if( (unsigned)sizeList[0]< set->entrylist[i]->nbElem){ //realloc if needed
+        
                    sizeList= reallocsizeList(sizeList, set->entrylist[i]->nbElem);
-
                     if(!sizeList){
                         fprintf(stderr, "error in merge(%p , %p ) failed to realloc sizeList", (void*)set, (void*) errorLpointer);
                         return;
@@ -278,13 +281,9 @@ void merge ( HEAP_SET * set , int ** sizeListPtr){
     }
     *sizeListPtr = sizeList;
     if(mergeCheck){
-       // printf("reached recursive condition\n");
-       
         merge(set, sizeListPtr);
     }
-
-   // updateMin(set);
-   
+   // updateMin(set); 
 }//tested seems ok 
 
 void mergeWrapper( HEAP_SET * set){
@@ -292,14 +291,14 @@ void mergeWrapper( HEAP_SET * set){
     wrapper for merge function; handles the dynamic array and stuff
     */
     if(!set) return;
-    int * sizeArr=(int*) malloc(17*sizeof(int));
+    int * sizeArr=(int*) malloc(65*sizeof(int));
     if(!sizeArr){
         fprintf(stderr, "error in mergeWrapper(%p) unable to allocate memory for sizeArr", (void*)set);
         return;
     }
-    sizeArr[0]=16;
+    sizeArr[0]=64;
     
-    for(unsigned i=1; i<17;i++){
+    for(unsigned i=1; i<65;i++){
         sizeArr[i]=-1;
     }
 
@@ -412,6 +411,18 @@ void removeSet(HEAP_SET * set, unsigned index){
 }//tested ; ok
 
 
+static void updateNbElem (HEAP_SET * set){
+    if(!set) return;
+    if(!set->entrylist) return;
+    set->nbelem=0;
+    for(unsigned i=0 ; i<set->size; i++){
+        if(set->entrylist[i]){
+            set->nbelem+=set->entrylist[i]->nbElem;
+        }
+    }
+}
+
+
 int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
     /*
     assumes that the node to pop is actually in the entry of the set 
@@ -433,8 +444,7 @@ int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
 
     if(!(node && entry)) return 0;
 
-
-    set->nbelem--; //decrease nbelem before actually deleting it to make call to update min acurate
+    set->nbelem=set->nbelem-1; //decrease nbelem before actually deleting it to make call to update min acurate
 
     int ret= node->key;
     if(!node->parent){ //case where node is the root of the entry 
@@ -443,7 +453,7 @@ int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
         if(node->lchild && node->rchild){ //both not null
             
             node->lchild->parent=node->rchild->parent=NULL;
-            int sizeL, sizeR; 
+            int sizeL=0, sizeR=0; 
 
             heapSize(&sizeL, node->lchild);
             heapSize(&sizeR, node->rchild);
@@ -452,22 +462,22 @@ int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
             entry->skHeap= node->lchild;
 
             insertNode(set, node->rchild, sizeR); //inserts rchild in the heap
-            
+          
 
         }else if(node->lchild){  //only lchild
             node->lchild->parent=NULL;
 
             entry->nbElem--;  //bc if no right child only root is popped etc
             entry->skHeap= node->lchild; 
+        
         }else if(node->rchild){ //only rchild
             
             node->rchild->parent=NULL;
-
-            entry->nbElem--;  //bc if no right child only root is popped etc
             entry->skHeap= node->lchild; 
+           
         }else{ //both are null
         //frees entry and set stuff to null
-            freeEntry(entry);
+            removeSet(set, entry_index);
             set->entrylist[entry_index]=NULL;
         }
 
@@ -482,27 +492,41 @@ int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
         }else{
             node->parent->rchild=NULL;
         }
+        if(node->lchild || node ->rchild){
+            if(node->lchild){
+                node->lchild->parent=NULL; 
+
+                int sizeL=0;;
+
+                heapSize(&sizeL, node->lchild);
+                insertNode(set, node->lchild, sizeL);
+                set->entrylist[entry_index]->nbElem-=sizeL;
+               
+            }
+            if(node->rchild){
+                node->rchild->parent=NULL; 
+
+                int sizeR=0;
+
+                heapSize(&sizeR, node->lchild);
+                insertNode(set, node->rchild, sizeR);
+                set->entrylist[entry_index]->nbElem-=sizeR;
+                set->entrylist[entry_index]->nbElem--;
+                
+            }
+            set->entrylist[entry_index]->nbElem--;
+            
+        }else{
+            set->entrylist[entry_index]->nbElem--;
+            
+        }
         
-        if(node->lchild){
-            node->lchild->parent=NULL; 
-
-            int sizeL;
-
-            heapSize(&sizeL, node->lchild);
-            insertNode(set, node->lchild, sizeL);
-        }
-        if(node->rchild){
-            node->rchild->parent=NULL; 
-
-            int sizeR;
-
-            heapSize(&sizeR, node->lchild);
-            insertNode(set, node->rchild, sizeR);
-        }
     }
 
     free(node);
     mergeWrapper(set);
+    updateNbElem(set);
+
     return ret;
 
 }//awful ; hellish ; atrocious ; horrible; deletion in O(1) my ass fibo trees are bullshit and I suck
