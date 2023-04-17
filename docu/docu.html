@@ -35,15 +35,15 @@
         <div id="p1">
             <h2><u>I: Introduction</u></h2>
             <p>
-                Fibofuck is a <a href=" https://esolangs.org/wiki/Brainfuck">brainfuck</a> like <a href=https://esolangs.org/wiki/Esoteric_programming_language>Esolang</a>. It's goal is to  
-                be a <a href=" https://esolangs.org/wiki/Brainfuck">brainfuck<a> where the environment is a <a href="https://en.wikipedia.org/wiki/Fibonacci_heap">fibonnaci heap</a>
+                Fibofuck is a <a href="https://esolangs.org/wiki/Brainfuck" target="_blank">brainfuck</a> like <a href="https://esolangs.org/wiki/Esoteric_programming_language" target="_blank">Esolang</a>. It's goal is to  
+                be a <a href="https://esolangs.org/wiki/Brainfuck" target="_blank">brainfuck<a> where the environment is a <a href="https://en.wikipedia.org/wiki/Fibonacci_heap" target="_blank">fibonnaci heap</a>
                 instead of a list/array.
                 However for the sake of minimalism and simplicity the language doesn't use n-ary trees like regular 
                 fibonacci heaps would. 
-                Instead each tree in the heap is a <a href=https://en.wikipedia.org/wiki/Skew_heap>Skew heap</a>.
-                The language's lexic and syntax are very similar to <a href=" https://esolangs.org/wiki/Brainfuck">brainfuck</a>.  
-                Some <a href=" https://esolangs.org/wiki/Brainfuck">brainfuck</a> instructions are also redefined to make sense 
-                in the context of a <a href="https://en.wikipedia.org/wiki/Heap_(data_structure)">heap</a> (cf documentation of <code>,</code> , <code>&gt;</code> and
+                Instead each tree in the heap is a <a href="https://en.wikipedia.org/wiki/Skew_heap" target="_blank">Skew heap</a>.
+                The language's lexic and syntax are very similar to <a href=" https://esolangs.org/wiki/Brainfuck" target="_blank">brainfuck</a>.  
+                Some <a href=" https://esolangs.org/wiki/Brainfuck" target="_blank">brainfuck</a> instructions are also redefined to make sense 
+                in the context of a <a href="https://en.wikipedia.org/wiki/Heap_(data_structure)" target="_blank">heap</a> (cf documentation of <code>,</code> , <code>&gt;</code> and
                 <code>&lt;</code>)
 
                 
@@ -175,16 +175,16 @@
                 </tbody>
             </table>
         </div>
-        <div id=""p4>
+        <div id="p4">
             <h2><u>IV: Turing Completness</u></h2>
             <p>
                 This paragraph attempts to show that brainfuck can be simulated in fibofuck. 
                 To do so we have to setup a specific heap where the root of each tree is set to 0 
                 and each of their children is set to an arbitrary high number (superior to 256).
-                A way to achieve that is to have a tree of size 1 , one of size 2 ,.... one of size n 
-                
-                By creating such a heap. The behavior of the <code>+</code> , <code>-</code> , 
-                <code>[</code> , <code>]</code> , <code>&lt;</code> , <code>&gt;</code>
+                A way to achieve that is to initialise a tree of size 1 , one of size 2 ,.... one of size n   
+                <br/>By creating such a heap of arbitrary size. The behavior of the <code>+</code> , <code>-</code> , 
+                <code>[</code> , <code>]</code> , <code>&lt;</code> , <code>&gt;</code> , <code>.</code> is the exact same 
+                as the behavior of their brainfuck counterpart.
             </p>
         </div>
 </body>

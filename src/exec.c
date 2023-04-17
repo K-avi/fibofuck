@@ -54,13 +54,15 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
       break; 
       case INT_LTREE :
             if(curTree==-1) break;
-            for (int i=curTree; i> 0; i-- ){   
+           
+            for (int i=curTree-1; i>= 0; --i ){ 
                 if(set->entrylist[i]){
                   curTree=i; 
                   curnode = set->entrylist[i]->skHeap;
                   break;
                 }
             }
+            
             
       break;
 

@@ -153,6 +153,5 @@ int main(int argc, char ** argv){
 
         yylex_destroy();
     }
-    printf("reached endof main\n");
     return 0;
 }

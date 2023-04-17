@@ -54,13 +54,13 @@ void envDump( S_ENVIRONMENT * env){
          return;
     }
     
-    if(env->curnode) printf("node ptr in env set to node of id %p , containing key %d , parent is %p",
+    if(env->curnode) printf("\nnode ptr in env set to node of id %p , containing key %d , parent is %p\n",
     (void*) env->curnode, env->curnode->key ,(void*) env->curnode->parent);
 
     else printf("node ptr is NULL\n");
 
     if(env->curTree!=-1) printf("tree pointer is set to %d\n", env->curTree);
-    else printf("tree pointer set to default");
+    else printf("tree pointer set to default\n");
 
     heapDump(env->heap_set);
     
