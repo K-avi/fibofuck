@@ -291,7 +291,7 @@ static void merge ( HEAP_SET * set ){
     if(mergeCheck){
         merge(set);
     }
-   // updateMin(set); 
+   //updateMin(set); 
 }//tested seems ok 
 
 void mergeWrapper( HEAP_SET * set){
@@ -350,7 +350,7 @@ void insertKey(HEAP_SET * set, int key){
    }
 
    mergeWrapper(set);
-  
+   updateMin(set);
 }//tested ; ok
 // shouldn't need the loop in realloc case
 
@@ -388,6 +388,7 @@ void insertNode ( HEAP_SET * set, S_NODE * root, int treeSize){
    }
 
    mergeWrapper(set);
+   updateMin(set);
 }// tested ; ok
 
 void removeSet(HEAP_SET * set, unsigned index){
@@ -525,7 +526,7 @@ int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index){
     free(node);
     mergeWrapper(set);
     updateNbElem(set);
-
+    updateMin(set);
     return ret;
 
 }//awful ; hellish ; atrocious ; horrible; deletion in O(1) my ass fibo trees are bullshit and I suck
