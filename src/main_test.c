@@ -1,3 +1,4 @@
+#include "globals.h"
 #include "skew.h"
 #include "fibo.h"
 
@@ -132,7 +133,7 @@ printf("heap after pop of lchild");
 
 
     freeSkewHeap(heap1);*/
-
+/*
   HEAP_SET * set = initSet(5);
  /*insertKey(set, 2);
   insertKey(set, 2);
@@ -140,7 +141,7 @@ printf("heap after pop of lchild");
   insertKey(set, 2);
   insertKey(set, 2);
   insertKey(set, 2);
-  insertKey(set, 2);*/
+  insertKey(set, 2);
 
   S_NODE * n= initNode(5);
 
@@ -205,15 +206,15 @@ insertKey(set , 12);
 insertKey(set , 3);
 
 insertKey(set , 12);
+*/
 
 /*
-
 int * sizelist = malloc(11* sizeof(int));
   for(int i=0 ; i<11; i++){
     sizelist[i]=-1;
   }
 
- if(sizelist) sizelist[0]=10;*/
+ if(sizelist) sizelist[0]=10;
 
   mergeWrapper(set);
   heapDump(set);
@@ -243,5 +244,22 @@ heapDump(set);
 
 printf("%u", (unsigned)-1);
   freeSet(set);
+  */
+
+  sizeArrPtr = malloc(sizeof(int**));
+  *sizeArrPtr= malloc(5*sizeof(int));
+  *sizeArrPtr[0]= 4;
+
+  for(int i=1; i<5; i++){
+    (*sizeArrPtr)[i]= -1;
+  }
+  printf("%p %p\n", sizeArrPtr, *sizeArrPtr);
+
+  reallocsizeList(60);
+  printf("%p %p ", sizeArrPtr, *sizeArrPtr);
+
+  free(*sizeArrPtr); 
+  free(sizeArrPtr);
+
   return 0;
 }

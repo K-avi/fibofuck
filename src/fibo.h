@@ -39,10 +39,15 @@ extern int popSetNode(HEAP_SET * set , S_NODE * node , unsigned entry_index);
 
 extern void increaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node);
 extern void decreaseKey(HEAP_SET * set, unsigned entry_index, S_NODE*  node);
-extern void merge ( HEAP_SET * set , int ** sizeListPtr); //only for tests 
+
 extern void mergeWrapper( HEAP_SET * set);
 
+extern  int * reallocsizeList( unsigned realloc_size);
+#ifdef DEBUG
+extern void merge ( HEAP_SET * set); //only for tests 
 extern void insertNode ( HEAP_SET * set, S_NODE * root, int treeSize); //only for tests
+#endif
+
 
 /* misc handling */
 extern void updateMin( HEAP_SET * set);

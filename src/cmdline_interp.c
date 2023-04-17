@@ -23,6 +23,7 @@ void interactive_interp(S_ENVIRONMENT * environment, S_STACK * stack ){
 
     fflush(stdin); 
     fflush(stdout);
+    flushStack(stack);
 
     char lprint=1;
 

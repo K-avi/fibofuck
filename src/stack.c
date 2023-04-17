@@ -22,6 +22,18 @@ S_STACK * init_stack(unsigned size){
 }//tested ;ok
 
 
+void flushStack( S_STACK * stack){
+    /*
+    sets a stack to null
+    */
+    if(!stack) return ;
+    if(!stack->stack) return;
+    
+    for(unsigned i=0; i<stack->size; i++){
+        stack->stack[i]=NULL;
+    }
+}
+
 void print_stack( S_STACK* stack){
     /*
     */

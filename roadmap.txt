@@ -1,22 +1,8 @@
-set up the manipulation of 
 
--> skew heaps 
-    -skew heaps prolly done; need to check edge cases of popNode
-
--> list of tree roots for fibo heap 
-    -using a doubly linked list is actually stupid 
-    -I'll put these bad boys in a dynamic array and that'll be better
-	-> popping a node will be wayyyyyyy simpler and so on 
-
--> implement the fibo heap proper 
-    -the structure will be simple enough 
-    -the interresting bit is the merge function cuz it'll have to be weird
-
-
-once all of this is done with move on to tuning parsing n then exec
-
-at least the docu is done ig lol
-
-start to think about the tokens and the parser 
-
-merge will be so painfull 
+-> fix loops 
+	-> done
+ 
+-> make it scale better -> dont reallocate the fucking size array at every fucking call
+	-> done i think
+-> do docu 
+-> write test programs

@@ -12,6 +12,7 @@ typedef struct stack{
 extern S_STACK * init_stack(unsigned size);
 extern void print_stack( S_STACK* stack);
 extern void free_stack( S_STACK* stack);
+extern void flushStack( S_STACK * stack);
 
 #define STACK_SIZE 256
 

@@ -10,6 +10,10 @@ extern S_STACK * stack;
 extern unsigned char progempty;
 extern S_ENVIRONMENT * environment;
 
+extern int ** sizeArrPtr;
+
+#define _size_sizeArr_default 65
+
 extern int default_keyval;
 
 #endif

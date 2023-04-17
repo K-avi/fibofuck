@@ -22,6 +22,10 @@
                         <ul>
                             <li><a href="#p1" class="text-justify">I: Introduction</a></li>
                             <li><a href="#p2">II: Environment </a></li>
+                                <ul>
+                                    <li><a href="#p21">2.1: General presentation</a></li>
+                                    <li><a href="#p22">2.2: Behavior of operations</a></li>
+                                </ul>
                             <li> <a href="#p3">III:  Instructions</a> </li>
                             <li><a href="#p4">IV: Fibofuck's Turing completness</a></li>
                         </ul>
@@ -48,18 +52,48 @@
         <hr/>
         <div id="p2">
             <h2><u>II: Environment</u></h2>
-            <p>
-                The environment of fibofuck is a heap very similar to a fibo heap.
-                The only difference being that trees in the heap are implemented as binary skew heap. 
-                Which means that no node has more than two children. 
-                The tree is implemented this way to make the language more simple (n-ary tree support would have 
-                made a more complex syntax necessary).
-                At the beginning of the program, the heap is 
-                empty. The maximal size of the heap is theoretically infinite. 
-                Each node of the heap contains a signed integer.
-                Note that the structure of the fibo heap is always maintained and that the heap is updated after 
-                each instruction.
-            </p>
+            <div id="p21">
+                <h4><em>II.1: General presentation</em></h4>
+                <p class="text-left">
+                        The environment of fibofuck is a heap similar in concept to a fibo heap.
+                        The key difference being that trees in the heap are implemented as binary skew heap. 
+                        Which means that no node has more than two children. 
+                        The tree is implemented this way to make the language more simple (n-ary tree support would have 
+                        made a more complex syntax necessary).
+                        At the beginning of the program, the heap is 
+                        empty. The maximal size of the heap is theoretically infinite. 
+                        Each node of the heap contains a signed integer.
+                        Note that the structure of the fibo heap is always maintained and that the heap is updated after 
+                        each instruction.
+                        This means that the heap is really "merge heavy". This is one of the differences between a regular 
+                        Fibo heap and the heap in fibofuck. In a regular fibo heap, the merge call is often only done after 
+                        deletion of an element. Here it's done after every instruction making the whole environment very chaotic.
+        
+                        Another important detail is that the tree follow the merge operation of skew heaps. This means that 
+                        their right and left branch will get swapped after a merge. 
+                </p>
+            </div>
+            <div id="p22">
+                <h4><em>II.1: Behavior of operations</em></h4>
+                <p class="text-left">
+                    The behavior of every operation on the fibo heap will be documented here: 
+                    <ul>
+                    <li>merge : Mix of skew heap AND fibo heap. Applies the skew heap merge operation on 2 trees of the same size (number of nodes) until
+                         every tree in the heap is of different size</li>
+                    <li>insert node: comes from fibo heap. Adds a node to the heap and then calls merge</li>
+                    <li>delete node : comes from fibo heap. Deletes a node from a tree. If it has children 
+                        insert it's children in the heap as new trees and then call merge</li>
+                    <li>delete tree: deletes a tree from the heap</li>
+                    <li>decrease key : comes from skew heap. Decrease a key in a tree and then heapifies it</li>
+                    <li>increase key : comes from skew heap. Increase a key in a tree and then heapifies it</li>
+                    </ul>
+
+                    What I find interresting about this is that the environment is merge heavy which means that 
+                    it's hard to predict how it's gonna evolve after insertion or deletion.
+                </p>
+            </div>
+
+        
         </div>
         <hr/>
         <div id="p3">
@@ -102,12 +136,12 @@
                         <td>moves the node pointer to the root of the next tree in the heap if the current tree is not the last </td>
                     </tr>
                     <tr>
-                        <td style="text-align:center"><code>?</code></td>
-                        <td>forces the merge operation on the heap</td>
-                    </tr>
-                    <tr>
                         <td style="text-align:center"><code>!</code></td>
                         <td>removes the node under the pointer from the heap</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center"><code>*</code></td>
+                        <td>removes the tree containing the node under the pointer from the heap</td>
                     </tr>
                     <tr>
                         <td style="text-align:center"><code>+</code></td>
@@ -144,7 +178,13 @@
         <div id=""p4>
             <h2><u>IV: Turing Completness</u></h2>
             <p>
+                This paragraph attempts to show that brainfuck can be simulated in fibofuck. 
+                To do so we have to setup a specific heap where the root of each tree is set to 0 
+                and each of their children is set to an arbitrary high number (superior to 256).
+                A way to achieve that is to have a tree of size 1 , one of size 2 ,.... one of size n 
                 
+                By creating such a heap. The behavior of the <code>+</code> , <code>-</code> , 
+                <code>[</code> , <code>]</code> , <code>&lt;</code> , <code>&gt;</code>
             </p>
         </div>
 </body>

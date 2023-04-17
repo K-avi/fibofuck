@@ -1,4 +1,5 @@
 #include "fibo.h"
+#include "globals.h"
 #include "skew.h"
 
 #include <limits.h>
@@ -164,41 +165,45 @@ void updateMin( HEAP_SET * set){
 }//tested; ok
 
 
-static inline int * reallocsizeList(int * sizeList , unsigned realloc_size){
+ int * reallocsizeList( unsigned realloc_size){
     /*
     reallocs the sizeList array of the merge function by adding realloc_size entries to it and initializing 
     them to -1.
     */
-    if(!sizeList )return NULL;
-    int NbMaxSizeList= sizeList[0];
+
+    if(!sizeArrPtr) return NULL;
+    
+    if(! (*sizeArrPtr) )return NULL;
+    
+    int NbMaxSizeList= (*sizeArrPtr)[0];
     if(NbMaxSizeList<=0) return NULL;
 
-    int * errorLpointer= sizeList;
+    int * errorLpointer= (*sizeArrPtr);
     //printf("nbmaxsizelist is %d", NbMaxSizeList);
-    sizeList= (int* ) realloc(sizeList, (NbMaxSizeList+ realloc_size)* sizeof(int));
-    if(!sizeList){
+    (*sizeArrPtr)= (int* ) realloc((*sizeArrPtr), (NbMaxSizeList+ realloc_size)* sizeof(int));
+    if(!(*sizeArrPtr)){
         
-        sizeList=NULL;
+        (*sizeArrPtr)=NULL;
 
         free(errorLpointer);
         fprintf(stderr, "error in reallocsizeList(%p , %u ) failed to realloc sizeList", (void*) errorLpointer, realloc_size);
         return NULL;   
     }
-    printf("realloc size %u , szl[0] %d\n", realloc_size, sizeList[0]);
-    for(int i =sizeList[0]; i< ((int)sizeList[0]+(int)realloc_size) ; i++){
-        printf("in realloc i= %d realloc size = %u", i, realloc_size);
-        sizeList[i]= -1;
+   // printf("realloc size %u , szl[0] %d\n", realloc_size, sizeList[0]);
+    for(int i =(*sizeArrPtr)[0]; i< ((int)(*sizeArrPtr)[0]+(int)realloc_size) ; i++){
+       // printf("in realloc i= %d realloc size = %u", i, realloc_size);
+      
+        (*sizeArrPtr)[i]= -1;
     }
-   
-    sizeList[0]+= (int)realloc_size;
-
-    return  sizeList;
+    (*sizeArrPtr)[0]+= (int)realloc_size;
+    
+    return  (*sizeArrPtr);
 }
 //not tested ; possibly wrong 
 
 
 
-void merge ( HEAP_SET * set , int ** sizeListPtr){
+static void merge ( HEAP_SET * set ){
     /*
     the merge function will merge trees containing the same number of nodes. 
     It will be called until the size of every tree is different 
@@ -216,27 +221,27 @@ void merge ( HEAP_SET * set , int ** sizeListPtr){
 
     merge will call itself recursively so sizeList needs to be allocated / de allocated after calling the function
     */
-    if(! (set && sizeListPtr)) return;
-    int * sizeList = *sizeListPtr;
-    if(!( sizeList)) return;
+    if(! (set && sizeArrPtr)) return;
+    
+    if(!( (*sizeArrPtr))) return;
     if(!set->entrylist) return;
-    int * errorLpointer = sizeList; //used to dump error in failed realloc
+    int * errorLpointer = (*sizeArrPtr); //used to dump error in failed realloc
 
     unsigned char mergeCheck =0; //used to check if a merge occured and call merge recursively if so
     
 
     for(unsigned i=0 ; i<set->size; i++){
         if( set->entrylist[i]){
-            if(set->entrylist[i]->nbElem > (unsigned) sizeList[0]){ //check for realloc
+            if(set->entrylist[i]->nbElem > (unsigned) (*sizeArrPtr)[0]){ //check for realloc
           
-                sizeList=reallocsizeList(sizeList, set->entrylist[i]->nbElem);
-                if(!sizeList) {
+                (*sizeArrPtr)=reallocsizeList( set->entrylist[i]->nbElem);
+                if(!(*sizeArrPtr)) {
                     fprintf(stderr, "error in merge(%p , %p ) failed to realloc sizeList", (void*)set, (void*) errorLpointer);
                     return;
                 }
             }
            // printf("at i=%u sizeList[j]=%d j=%u", i, sizeList[set->entrylist[i]->nbElem], set->entrylist[i]->nbElem);
-            if(( sizeList[set->entrylist[i]->nbElem] !=-1 )&& (  sizeList[set->entrylist[i]->nbElem]!= (int)i) ){ //merge case
+            if(( (*sizeArrPtr)[set->entrylist[i]->nbElem] !=-1 )&& (  (*sizeArrPtr)[set->entrylist[i]->nbElem]!= (int)i) ){ //merge case
                 /*
                 gotta: 
                 ->merge trees in the 2 entries; 
@@ -244,44 +249,47 @@ void merge ( HEAP_SET * set , int ** sizeListPtr){
                 -> set index of newsize in sizelist to current index 
                 */
            
-                int heapIndex= sizeList[set->entrylist[i]->nbElem]; //retrieves index
+                int heapIndex= (*sizeArrPtr)[set->entrylist[i]->nbElem]; //retrieves index
                 
-                sizeList[set->entrylist[heapIndex]->nbElem]=-1; //sets the index back to default
+                (*sizeArrPtr)[set->entrylist[heapIndex]->nbElem]=-1; //sets the index back to default
 
                 set->entrylist[i]->skHeap= mergeHeaps(set->entrylist[i]->skHeap,  set->entrylist[heapIndex]->skHeap);
                 set->entrylist[i]->nbElem+=set->entrylist[heapIndex]->nbElem;
 
                 removeSet(set, heapIndex); //unsets the entry
+                if(! set->entrylist[i]){
+                    i++; 
+                    continue;
+                }
                 set->entrylist[heapIndex]=NULL;
-
-                if( (unsigned)sizeList[0]< set->entrylist[i]->nbElem){ //realloc if needed
+                if( (unsigned)(*sizeArrPtr)[0]< set->entrylist[i]->nbElem){ //realloc if needed
         
-                   sizeList= reallocsizeList(sizeList, set->entrylist[i]->nbElem);
-                    if(!sizeList){
+                   (*sizeArrPtr)= reallocsizeList( set->entrylist[i]->nbElem);
+                    if(!(*sizeArrPtr)){
                         fprintf(stderr, "error in merge(%p , %p ) failed to realloc sizeList", (void*)set, (void*) errorLpointer);
                         return;
                     }
                 }
-                sizeList[set->entrylist[i]->nbElem]= i; //sets index for tree of new size
+                (*sizeArrPtr)[set->entrylist[i]->nbElem]= i; //sets index for tree of new size
 
                 mergeCheck=1; 
             }else{ //set for merge
                // printf("at i=%u, reached non merge condition\n", i);
-                if( (unsigned) sizeList[0]< set->entrylist[i]->nbElem){ //realloc if needed
-                    sizeList=reallocsizeList(sizeList, set->entrylist[i]->nbElem);
+                if( (unsigned) (*sizeArrPtr)[0]< set->entrylist[i]->nbElem){ //realloc if needed
+                    (*sizeArrPtr)=reallocsizeList( set->entrylist[i]->nbElem);
 
-                    if(!sizeList){
+                    if(!(*sizeArrPtr)){
                         fprintf(stderr, "error in merge(%p , %p ) failed to realloc sizeList", (void*)set, (void*) errorLpointer);
                         return;
                     }
                 }
-                sizeList[set->entrylist[i]->nbElem]=i;
+                (*sizeArrPtr)[set->entrylist[i]->nbElem]=i;
             }
         }
     }
-    *sizeListPtr = sizeList;
+    //*sizeArrPtr = (*sizeArrPtr);
     if(mergeCheck){
-        merge(set, sizeListPtr);
+        merge(set);
     }
    // updateMin(set); 
 }//tested seems ok 
@@ -291,24 +299,15 @@ void mergeWrapper( HEAP_SET * set){
     wrapper for merge function; handles the dynamic array and stuff
     */
     if(!set) return;
-    int * sizeArr=(int*) malloc(65*sizeof(int));
-    if(!sizeArr){
-        fprintf(stderr, "error in mergeWrapper(%p) unable to allocate memory for sizeArr", (void*)set);
-        return;
-    }
-    sizeArr[0]=64;
-    
-    for(unsigned i=1; i<65;i++){
-        sizeArr[i]=-1;
-    }
+    if(! sizeArrPtr) return;
+    if(! * sizeArrPtr) return;
 
-    int **sizeArrPtr =(int**) malloc(sizeof(int*));
-    *sizeArrPtr= sizeArr;
-    merge(set,sizeArrPtr );
+   
+    merge(set );
 
-    
-    free(*sizeArrPtr); 
-    free(sizeArrPtr);
+    for(int i = 1; i<(*sizeArrPtr)[0]; i++){
+        (*sizeArrPtr)[i]=-1;
+    }
 }//tested ok
 
 void insertKey(HEAP_SET * set, int key){

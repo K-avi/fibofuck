@@ -24,7 +24,8 @@ void sigint_handler( int sig){
  
     if(stack) free_stack(stack);
     if(environment) freeEnv(environment);
-
+    if(*sizeArrPtr)free(*sizeArrPtr);
+    if(sizeArrPtr) free(sizeArrPtr); 
     yylex_destroy();
     printf("\n");
     exit (SIGINT);
@@ -87,7 +88,31 @@ int main(int argc, char ** argv){
    
     stack= init_stack(STACK_SIZE);
     environment= initEnv(_set_size_default);
+
+    sizeArrPtr= (int**) malloc(sizeof(int*));
+    if(!sizeArrPtr){
+        fprintf(stderr, "error in main ; failed to allocate memory for sizeArrPtr\n");
+        
+        free(sizeArrPtr);
+        free_stack(stack);
+        freeEnv(environment);
+        exit(-4);
+    }
+    *sizeArrPtr= (int*) malloc(3*sizeof(int));
+    if(!*sizeArrPtr){
+        fprintf(stderr, "error in main ; failed to allocate memory for sizeArrPtr\n");
+        
+        free(sizeArrPtr);
+        free_stack(stack);
+        freeEnv(environment);
+
+        exit(-5);
+    }
+    (*sizeArrPtr)[0]=2;
     
+    for(unsigned i=1; i<3;i++){
+        (*sizeArrPtr)[i]=-1;
+    }
 
     if (cmdline_mode) {
 
@@ -98,7 +123,9 @@ int main(int argc, char ** argv){
          free_stack(stack);
          freeEnv(environment);
          free_prog(prog);
-
+         free(*sizeArrPtr);
+         free(sizeArrPtr); 
+         
          return 0;
          
     }else if(file_mode){
@@ -119,11 +146,13 @@ int main(int argc, char ** argv){
         free_stack(stack);
         free_prog(prog);
         freeEnv(environment);
+        free(*sizeArrPtr);
+        free(sizeArrPtr); 
         
         progempty=1;
 
         yylex_destroy();
     }
-    printf("\n");
+    printf("reached endof main\n");
     return 0;
 }

@@ -69,13 +69,13 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
       case INT_PARENT : if(curnode) { if(curnode->parent) curnode=curnode->parent ;} break;
 
       case INT_PLUS : if(curnode && (curTree !=-1)) increaseKey(set,  curTree, curnode);  break;
-      case INT_MIN :  if(curnode && (curTree !=-1)) decreaseKey(set,  curTree, curnode); break;
+      case INT_MINUS : if(curnode && (curTree !=-1)) decreaseKey(set,  curTree, curnode); break;
 
       case INT_LBRACKET : 
 
-            if(!curnode) break; //handles empty set this way
-
-            if (curnode->key == 0) {
+            if(!curnode) {
+              curr = curr->other; //handles empty set this way
+            } else if (curnode->key == 0) {
               
                 curr = curr->other;
             } else {
@@ -87,9 +87,9 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
       break;
 
       case INT_RBRACKET : 
-       
+//printf("reahced rbrack stackptr %u stack[sptr] %p stack[sptr-1] %p\n", stack_ptr, stack )
           curr = stack->stack[--stack_ptr];
-      break;
+      continue;
 
       case INT_POP :  //prolly wrong
 
@@ -111,10 +111,8 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
                   
                   if(curnode->lchild || curnode->rchild){ 
                   //at least a child so a new root will be set in the entry
-printf("reached root pop case \n");
-                      popSetNode(set, curnode, curTree);
-printf(" set entryl cur %p\n",(void*)set->entrylist[curTree]);
 
+                      popSetNode(set, curnode, curTree);
                      if(set->entrylist[curTree]) curnode=set->entrylist[curTree]->skHeap;
                      else{
                         for(unsigned i=0; i<set->size ; i++){//finds another tree
@@ -163,6 +161,7 @@ printf(" set entryl cur %p\n",(void*)set->entrylist[curTree]);
               }
             }
           }
+          updateMin(set);
       break;
 
       case INT_CREATE : 
