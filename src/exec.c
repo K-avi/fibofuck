@@ -7,6 +7,7 @@
 #include "skew.h"
 #include "stack.h"
 
+#include <stdlib.h>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <inttypes.h>
@@ -168,6 +169,19 @@ int exec( S_ENVIRONMENT * environment, S_STACK * stack , program* progr , unsign
 
       case INT_CREATE : 
           insertKey(set, 0);
+          
+          for(unsigned i=0; i<set->size; i++){
+            if(set->entrylist[i]){
+                curTree= i; 
+                curnode= set->entrylist[i]->skHeap;
+                break;
+           }
+          }
+          
+      break;
+
+      case INT_RAND : 
+          insertKey(set, rand()%500);
           
           for(unsigned i=0; i<set->size; i++){
             if(set->entrylist[i]){

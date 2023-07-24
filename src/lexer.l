@@ -28,6 +28,7 @@
 
 "%"         {return TOKEN(CREATE);}
 ","         { return TOKEN(READ); }
+"?"         { return TOKEN(RAND); }
 
 ":"         { return TOKEN(DPRINT);}
 "."         { return TOKEN(PRINT); }

@@ -38,6 +38,7 @@ int bison_token_to_internal( int token){
 
         case CREATE : return INT_CREATE ; break;
         case READ: return INT_READ; break;
+        case RAND: return INT_RAND; break;
 
         case PLUS: return INT_PLUS; break;
         case MINUS: return INT_MINUS; break;
@@ -83,6 +84,7 @@ char token_to_char(int token){
 
     case INT_READ: return ','; break;
     case INT_CREATE : return '%'; break;
+    case INT_RAND : return '?'; break;
 
     case INT_PRINT: return '.'; break;
     case INT_HEAPD : return '#'; break;
